@@ -5,7 +5,7 @@ using UnityEngine;
 public class HandBallScript : MonoBehaviour
 {
     new Rigidbody2D rigidbody2D;
-    Vector2 impulsForce = new Vector2(10.0f, 0.0f);
+    Vector2 DebugForce = new Vector2(10.0f, 0.0f);
     bool stop = false;
 
     void Start()
@@ -17,28 +17,21 @@ public class HandBallScript : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space) && !stop)
         {
-            Debug.Log("SpaceKey");
-            TestAddForce();
+            Debug.Log("SpaceKey->Debug");
+            DebugAddForce();
             stop = true;
+            Debug.Log(ZtoX());
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    void DebugAddForce()
     {
-        if (collision.transform.CompareTag("Cushion"))
-        {
-            Debug.Log("CushionHit");
-            //TestReverse();
-        }
+        //rigidbody2D.AddForce(DebugForce, ForceMode2D.Impulse);
+        rigidbody2D.AddForce(this.transform.forward, ForceMode2D.Impulse);
     }
 
-    void TestAddForce()
+    private float ZtoX()
     {
-        rigidbody2D.AddForce(impulsForce, ForceMode2D.Impulse);
-    }
-
-    void TestReverse()
-    {
-        //rigidbody2D.AddRelativeForce();
+        return (this.gameObject.transform.localEulerAngles.z % 90);
     }
 }
