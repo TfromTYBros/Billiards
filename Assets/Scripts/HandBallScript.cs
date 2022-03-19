@@ -12,7 +12,7 @@ public class HandBallScript : MonoBehaviour
     void Start()
     {
         rigidbody2D = this.GetComponent<Rigidbody2D>();
-        SetSpeed(10.0f);
+        SetSpeed(20.0f);
     }
 
     void Update()
