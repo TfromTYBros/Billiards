@@ -8,6 +8,9 @@ public class HandBallScript : MonoBehaviour
     //Vector2 DebugForce = new Vector2(10.0f, 0.0f);
     bool stop = false;
     float speed = 0.0f;
+    bool StepHeadArea = true;
+    bool StepRotation = false;
+    bool StepSpeed = false;
 
     void Start()
     {
@@ -25,6 +28,9 @@ public class HandBallScript : MonoBehaviour
             Debug.Log("ZtoX(): " + ZtoX());
             Debug.Log("ZtoY(): " + ZtoY());
         }
+        if (Input.GetMouseButton(0)) StepMove();
+        if (StepHeadArea) MouseFollowHeadSpotArea();
+        if (StepRotation) MouseFollowRotation();
     }
 
     void DebugAddForce()
@@ -65,5 +71,55 @@ public class HandBallScript : MonoBehaviour
             //Debug.Log("180 <= 360");
             return (speed - (speed * (Mathf.Abs((ballz % 180) - 90) / 90))) * -1;
         }
+    }
+
+    private void MouseFollow()
+    {
+        Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        this.gameObject.transform.position = mouse;
+    }
+
+    private void StepMove()
+    {
+        if (StepHeadArea)
+        {
+            StepHeadArea = false;
+            StepRotation = true;
+            StepSpeed = false;
+        }
+        else if (StepRotation)
+        {
+            StepHeadArea = false;
+            StepRotation = false;
+            StepSpeed = true;
+        }
+    }
+    
+    private void MouseFollowHeadSpotArea()
+    {
+        Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        if(mouse.x <= -4.3f)
+        {
+            mouse.x = -4.3f;
+        }
+        if(-2.6f <= mouse.x)
+        {
+            mouse.x = -2.6f;
+        }
+        if(mouse.y <= -1.825f)
+        {
+            mouse.y = -1.826f;
+        }
+        if(1.825f <= mouse.y)
+        {
+            mouse.y = 1.825f;
+        }
+        this.gameObject.transform.position = mouse;
+    }
+
+    private void MouseFollowRotation()
+    {
+        Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
     }
 }
