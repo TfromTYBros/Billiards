@@ -12,6 +12,8 @@ public class HandBallScript : MonoBehaviour
     bool StepRotation = false;
     bool StepSpeed = false;
 
+    public GameObject QuePos;
+
     void Start()
     {
         rigidbody2D = this.GetComponent<Rigidbody2D>();
@@ -31,6 +33,7 @@ public class HandBallScript : MonoBehaviour
         if (Input.GetMouseButton(0)) StepMove();
         if (StepHeadArea) MouseFollowHeadSpotArea();
         if (StepRotation) MouseFollowRotation();
+        if (StepSpeed) MouseFollowSpeed();
     }
 
     void DebugAddForce()
@@ -61,7 +64,7 @@ public class HandBallScript : MonoBehaviour
     {
         float ballz = this.gameObject.transform.localEulerAngles.z % 360.0f;
         //Debug.Log("ballz: " + ballz);
-        if(0 <= ballz && ballz <= 180)
+        if (0 <= ballz && ballz <= 180)
         {
             //Debug.Log("0 <= 180");
             return speed - (speed * (Mathf.Abs((ballz % 180) - 90) / 90));
@@ -87,30 +90,31 @@ public class HandBallScript : MonoBehaviour
             StepRotation = true;
             StepSpeed = false;
         }
+        /*
         else if (StepRotation)
         {
             StepHeadArea = false;
             StepRotation = false;
             StepSpeed = true;
-        }
+        }*/
     }
-    
+
     private void MouseFollowHeadSpotArea()
     {
         Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        if(mouse.x <= -4.3f)
+        if (mouse.x <= -4.3f)
         {
             mouse.x = -4.3f;
         }
-        if(-2.6f <= mouse.x)
+        if (-2.6f <= mouse.x)
         {
             mouse.x = -2.6f;
         }
-        if(mouse.y <= -1.825f)
+        if (mouse.y <= -1.825f)
         {
             mouse.y = -1.826f;
         }
-        if(1.825f <= mouse.y)
+        if (1.825f <= mouse.y)
         {
             mouse.y = 1.825f;
         }
@@ -119,7 +123,30 @@ public class HandBallScript : MonoBehaviour
 
     private void MouseFollowRotation()
     {
-        Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 mouse = this.gameObject.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        /*
+        if (-6.0f <= mouse.x)
+        {
+            mouse.x = -6.0f;            
+        }
+        if (mouse.x <= 6.0f)
+        {
+            mouse.x = 6.0f;
+        }
+        if (-6.0f <= mouse.y)
+        {
+            mouse.y = -6.0f;
+        }
+        if (mouse.y <= 6.0f)
+        {
+            mouse.y = 6.0f;
+        }*/
+        QuePos.transform.position = mouse;
+        this.transform.rotation = Quaternion.FromToRotation(Vector2.right, QuePos.transform.position);
+    }
 
+    private void MouseFollowSpeed()
+    {
+        Debug.Log("MouseFollowSpeed");
     }
 }
