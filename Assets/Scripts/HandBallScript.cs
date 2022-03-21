@@ -5,33 +5,31 @@ using UnityEngine;
 public class HandBallScript : MonoBehaviour
 {
     new Rigidbody2D rigidbody2D;
-    //Vector2 DebugForce = new Vector2(10.0f, 0.0f);
-    bool stop = false;
     float speed = 0.0f;
+    bool BreakShot = false;
     bool StepHeadArea = true;
     bool StepRotation = false;
     bool StepSpeed = false;
-
-    public GameObject QuePos;
 
     void Start()
     {
         rigidbody2D = this.GetComponent<Rigidbody2D>();
         SetSpeed(20.0f);
+        //SetBreakShotTrue();
     }
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.Space) && !stop)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("SpaceKey->Debug");
             DebugAddForce();
-            stop = true;
-            Debug.Log("ZtoX(): " + ZtoX());
-            Debug.Log("ZtoY(): " + ZtoY());
+            //Debug.Log("ZtoX(): " + ZtoX());
+            //Debug.Log("ZtoY(): " + ZtoY());
         }
-        if (Input.GetMouseButton(0)) StepMove();
-        if (StepHeadArea) MouseFollowHeadSpotArea();
+        if (Input.GetMouseButtonDown(0)) StepMove();
+        if (BreakShot && StepHeadArea) MouseFollowHeadSpotArea();
+        else if (!BreakShot && StepHeadArea) FreeBall();
         if (StepRotation) MouseFollowRotation();
         if (StepSpeed) MouseFollowSpeed();
     }
@@ -45,6 +43,16 @@ public class HandBallScript : MonoBehaviour
     public void SetSpeed(float speedValue)
     {
         speed = speedValue;
+    }
+
+    void SetBreakShotTrue()
+    {
+        BreakShot = true;
+    }
+
+    void SetBreakShotFalse()
+    {
+        BreakShot = false;
     }
 
     private float ZtoX()
@@ -76,12 +84,6 @@ public class HandBallScript : MonoBehaviour
         }
     }
 
-    private void MouseFollow()
-    {
-        Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        this.gameObject.transform.position = mouse;
-    }
-
     private void StepMove()
     {
         if (StepHeadArea)
@@ -90,17 +92,23 @@ public class HandBallScript : MonoBehaviour
             StepRotation = true;
             StepSpeed = false;
         }
-        /*
         else if (StepRotation)
         {
             StepHeadArea = false;
             StepRotation = false;
             StepSpeed = true;
-        }*/
+        }
+        else if (StepSpeed)
+        {
+            StepHeadArea = true;
+            StepRotation = false;
+            StepSpeed = false;
+        }
     }
 
     private void MouseFollowHeadSpotArea()
     {
+        rigidbody2D.velocity = Vector2.zero;
         Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         if (mouse.x <= -4.3f)
         {
@@ -121,28 +129,34 @@ public class HandBallScript : MonoBehaviour
         this.gameObject.transform.position = mouse;
     }
 
+    private void FreeBall()
+    {
+        Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        this.gameObject.transform.position = mouse;
+        if (mouse.x <= -4.3f)
+        {
+            mouse.x = -4.3f;
+        }
+        if (4.3f <= mouse.x)
+        {
+            mouse.x = 4.3f;
+        }
+        if (mouse.y <= -1.825f)
+        {
+            mouse.y = -1.826f;
+        }
+        if (1.825f <= mouse.y)
+        {
+            mouse.y = 1.825f;
+        }
+        this.gameObject.transform.position = mouse;
+
+    }
+
     private void MouseFollowRotation()
     {
         Vector2 mouse = this.gameObject.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        /*
-        if (-6.0f <= mouse.x)
-        {
-            mouse.x = -6.0f;            
-        }
-        if (mouse.x <= 6.0f)
-        {
-            mouse.x = 6.0f;
-        }
-        if (-6.0f <= mouse.y)
-        {
-            mouse.y = -6.0f;
-        }
-        if (mouse.y <= 6.0f)
-        {
-            mouse.y = 6.0f;
-        }*/
-        QuePos.transform.position = mouse;
-        this.transform.rotation = Quaternion.FromToRotation(Vector2.right, QuePos.transform.position);
+        this.transform.rotation = Quaternion.FromToRotation(Vector2.right, mouse);
     }
 
     private void MouseFollowSpeed()
