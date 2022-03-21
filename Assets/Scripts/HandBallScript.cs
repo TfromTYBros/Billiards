@@ -13,10 +13,13 @@ public class HandBallScript : MonoBehaviour
 
     public GameObject SpeedChangeOBJ;
     public GameObject SpeedArrow;
+    public GameObject CantTouchAreaBox;
+    public GameObject Que;
 
     void Start()
     {
         rigidbody2D = this.GetComponent<Rigidbody2D>();
+        CantTouchAreaBox.SetActive(true);
         SetSpeed(20.0f);
         SetBreakShotTrue();
     }
@@ -86,12 +89,14 @@ public class HandBallScript : MonoBehaviour
             StepHeadArea = false;
             StepRotation = true;
             StepSpeed = false;
+            CantTouchAreaBox.SetActive(false);
         }
         else if (StepRotation)
         {
             StepHeadArea = false;
             StepRotation = false;
             StepSpeed = true;
+            Que.SetActive(false);
         }
         else if (StepSpeed)
         {
@@ -158,6 +163,7 @@ public class HandBallScript : MonoBehaviour
 
     private void MouseFollowRotation()
     {
+        Que.SetActive(true);
         Vector2 mouse = this.gameObject.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
         this.transform.rotation = Quaternion.FromToRotation(Vector2.right, mouse);
     }
@@ -165,10 +171,9 @@ public class HandBallScript : MonoBehaviour
     private void MouseFollowSpeed()
     {
         //Debug.Log("MouseFollowSpeed");
-        SpeedChangeOBJ.SetActive(true);
-        SpeedChangeOBJ.transform.rotation = Quaternion.identity;
+        SetSpeedFieldXY();
         Vector3 mouse = this.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouse.z = -2.0f;
+        mouse.z = -3.0f;
         mouse.x = SpeedChangeOBJ.transform.position.x - 0.1f;
         mouse.y = mouse.y * -1;
         if(mouse.y <= -1.7f)
@@ -182,5 +187,22 @@ public class HandBallScript : MonoBehaviour
         }
         SpeedArrow.transform.position = mouse;
         SetSpeed((2.0f + mouse.y) * 10);
+    }
+
+    void SetSpeedFieldXY()
+    {
+        SpeedChangeOBJ.SetActive(true);
+        SpeedChangeOBJ.transform.rotation = Quaternion.identity;
+        Vector3 SpeedPos = SpeedChangeOBJ.transform.position;
+        SpeedPos.z = -2.0f;
+        if (this.transform.position.y <= -1.5f)
+        {
+            SpeedPos.y = 0.0f;
+        }
+        if(1.5f <= this.transform.position.y)
+        {
+            SpeedPos.y = 0.0f;
+        }
+        SpeedChangeOBJ.transform.position = SpeedPos;
     }
 }
