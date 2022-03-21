@@ -23,14 +23,6 @@ public class HandBallScript : MonoBehaviour
 
     void Update()
     {
-        /*
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log("SpaceKey->Debug");
-            AddForce();
-            //Debug.Log("ZtoX(): " + ZtoX());
-            //Debug.Log("ZtoY(): " + ZtoY());
-        }*/
         if (Input.GetMouseButtonDown(0)) StepMove();
         if (BreakShot && StepHeadArea) MouseFollowHeadSpotArea();
         else if (!BreakShot && StepHeadArea) FreeBall();
@@ -103,7 +95,6 @@ public class HandBallScript : MonoBehaviour
         }
         else if (StepSpeed)
         {
-            //AllFalse
             StepHeadArea = false;
             StepRotation = false;
             StepSpeed = false;
@@ -142,6 +133,7 @@ public class HandBallScript : MonoBehaviour
 
     private void FreeBall()
     {
+        rigidbody2D.velocity = Vector2.zero;
         Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         this.gameObject.transform.position = mouse;
         if (mouse.x <= -4.3f)
@@ -183,9 +175,10 @@ public class HandBallScript : MonoBehaviour
         {
             mouse.y = SpeedChangeOBJ.transform.position.y - 1.7f;
         }
-        if(1.743 <= mouse.y)
+        if(1.7f <= mouse.y)
         {
-            mouse.y = SpeedChangeOBJ.transform.position.y + 1.743f;
+            //43
+            mouse.y = SpeedChangeOBJ.transform.position.y + 1.7f;
         }
         SpeedArrow.transform.position = mouse;
         SetSpeed((2.0f + mouse.y) * 10);
