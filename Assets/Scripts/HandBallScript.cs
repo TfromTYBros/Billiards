@@ -16,9 +16,12 @@ public class HandBallScript : MonoBehaviour
     public GameObject CantTouchAreaBox;
     public GameObject Que;
 
+    [SerializeField] public List<bool> MoveBalls;
+
     void Start()
     {
         rigidbody2D = this.GetComponent<Rigidbody2D>();
+        MakeMoveBalls();
         CantTouchAreaBox.SetActive(true);
         SetSpeed(20.0f);
         SetBreakShotTrue();
@@ -26,11 +29,20 @@ public class HandBallScript : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) StepMove();
+        if (Input.GetMouseButtonDown(0) && IsAllSleeping()) StepMove();
         if (BreakShot && StepHeadArea) MouseFollowHeadSpotArea();
         else if (!BreakShot && StepHeadArea) FreeBall();
         if (StepRotation) MouseFollowRotation();
         if (StepSpeed) MouseFollowSpeed();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Hole"))
+        {
+            SetBreakShotFalse();
+            SetFirstStep();
+        }
     }
 
     void AddForce()
@@ -100,9 +112,7 @@ public class HandBallScript : MonoBehaviour
         }
         else if (StepSpeed)
         {
-            StepHeadArea = false;
-            StepRotation = false;
-            StepSpeed = false;
+            SetFirstStep();
             SpeedChangeOBJ.SetActive(false);
             AddForce();
         }
@@ -110,6 +120,13 @@ public class HandBallScript : MonoBehaviour
         {
             StepRotation = true;
         }
+    }
+
+    private void SetFirstStep()
+    {
+        StepHeadArea = false;
+        StepRotation = false;
+        StepSpeed = false;
     }
 
     private void MouseFollowHeadSpotArea()
@@ -204,5 +221,21 @@ public class HandBallScript : MonoBehaviour
             SpeedPos.y = 0.0f;
         }
         SpeedChangeOBJ.transform.position = SpeedPos;
+    }
+
+    void MakeMoveBalls()
+    {
+        for (int i = 0; i < 15; i++) MoveBalls.Add(false);
+    }
+
+    public void SetMoveBalls(int index,bool isSleep)
+    {
+        MoveBalls[index] = isSleep;
+    }
+
+    bool IsAllSleeping()
+    {
+        foreach (bool ball in MoveBalls) if (!ball) return false;
+        return true;
     }
 }
