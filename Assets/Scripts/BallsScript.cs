@@ -4,29 +4,13 @@ using UnityEngine;
 
 public class BallsScript : MonoBehaviour
 {
-    HandBallScript HBS;
-    new Rigidbody2D rigidbody2D;
-    private void Start()
-    {
-        HBS = FindObjectOfType<HandBallScript>();
-        rigidbody2D = FindObjectOfType<Rigidbody2D>();
-    }
-    private void Update()
-    {
-        HBS.SetMoveBalls(ThisBallNumber(),IsBallSleeping());
-    }
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.transform.CompareTag("Hole"))
         {
             Debug.Log("HoleHit" + this.gameObject.name);
-            HBS.SetMoveBalls(ThisBallNumber(), true);
             this.gameObject.SetActive(false);
         }
-    }
-    private bool IsBallSleeping()
-    {
-        return rigidbody2D.IsSleeping();
     }
 
     int ThisBallNumber()

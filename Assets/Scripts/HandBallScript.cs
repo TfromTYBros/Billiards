@@ -19,23 +19,21 @@ public class HandBallScript : MonoBehaviour
     public GameObject Que;
     public GameObject[] BallsOBJ;
 
-    [SerializeField] public List<bool> MoveBalls;
+    bool IsAllBallsStop = true;
 
-    WaitForSeconds MoveStopTime = new WaitForSeconds(9.0f);
+    WaitForSeconds MoveStopTime = new WaitForSeconds(10.0f);
 
     void Start()
     {
         rigidbody2D = this.GetComponent<Rigidbody2D>();
-        MakeMoveBalls();
         CantTouchAreaBox.SetActive(true);
-        SetSpeed(20.0f);
         SetBreakShotTrue();
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && IsAllSleeping()) StepMove();
-        if (Input.GetMouseButtonDown(1) && IsAllSleeping()) StepReMove();
+        if (Input.GetMouseButtonDown(0) && IsAllBallsStop) StepMove();
+        if (Input.GetMouseButtonDown(1) && IsAllBallsStop) StepReMove();
         if (BreakShot && StepHeadArea) MouseFollowHeadSpotArea();
         else if (!BreakShot && StepHeadArea) FreeBall();
         if (StepRotation) MouseFollowRotation();
@@ -46,7 +44,8 @@ public class HandBallScript : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Hole"))
         {
-            Debug.Log("HoleHitByHandBall");
+            //Debug.Log("HoleHitByHandBall");
+            StopAllCoroutines();
             HandBallDisappear();
             SetBreakShotFalse();
             StartCoroutine(RagGoFirstStep());
@@ -55,23 +54,23 @@ public class HandBallScript : MonoBehaviour
 
     void HandBallDisappear()
     {
-        FreezeBalls();
+        rigidbody2D.velocity = Vector2.zero;
         spriteRenderer.enabled = false;
     }
 
     void FreezeBalls()
     {
-        Debug.Log("FreezeBalls");
+        //Debug.Log("FreezeBalls");
         foreach(GameObject ball in BallsOBJ)
         {
             Rigidbody2D rigidbody2D = ball.GetComponent<Rigidbody2D>();
             rigidbody2D.constraints = RigidbodyConstraints2D.FreezePosition;
         }
     }
-
+    
     void DecompressionBalls()
     {
-        Debug.Log("DecompressionBalls");
+        //Debug.Log("DecompressionBalls");
         foreach(GameObject ball in BallsOBJ)
         {
             Rigidbody2D rigidbody2D = ball.GetComponent<Rigidbody2D>();
@@ -155,8 +154,8 @@ public class HandBallScript : MonoBehaviour
             StepSpeed = false;
             SpeedChangeOBJ.SetActive(false);
             AddForce();
+            SetFalseIsAllBallsStop();
             StartCoroutine(AllBallStop());
-            currStep = 0;
         }
     }
 
@@ -165,7 +164,7 @@ public class HandBallScript : MonoBehaviour
         if (2 <= currStep || (!BreakShot && 1 <= currStep)) currStep--;
         if (!BreakShot && currStep == 0)
         {
-            DecompressionBalls();
+            FreezeBalls();
             StepHeadArea = true;
             StepRotation = false;
             StepSpeed = false;
@@ -181,26 +180,39 @@ public class HandBallScript : MonoBehaviour
         }
     }
 
-    private void GoFirstStep()
+    private void GoSecondStep()
     {
-        StepHeadArea = true;
-        StepRotation = false;
+        //IsAllBallsStop‚ÍAllBallStop()‚ÅŽÀ‘•Ï‚ÝB
+        spriteRenderer.enabled = true;
+        StepHeadArea = false;
+        StepRotation = true;
         StepSpeed = false;
-        currStep = 0;
+        currStep = 1;
     }
 
     private IEnumerator RagGoFirstStep()
     {
         yield return MoveStopTime;
+        SetTrueIsAllBallsStop();
+        FreezeBalls();
         StepHeadArea = true;
         StepRotation = false;
         StepSpeed = false;
         currStep = 0;
     }
 
+    void SetTrueIsAllBallsStop()
+    {
+        IsAllBallsStop = true;
+    }
+
+    void SetFalseIsAllBallsStop()
+    {
+        IsAllBallsStop = false;
+    }
+
     private void MouseFollowHeadSpotArea()
     {
-        rigidbody2D.velocity = Vector2.zero;
         Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         if (mouse.x <= -4.3f)
         {
@@ -224,7 +236,6 @@ public class HandBallScript : MonoBehaviour
 
     private void FreeBall()
     {
-        rigidbody2D.velocity = Vector2.zero;
         spriteRenderer.enabled = true;
         Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         this.gameObject.transform.position = mouse;
@@ -258,19 +269,20 @@ public class HandBallScript : MonoBehaviour
     {
         //Debug.Log("MouseFollowSpeed");
         SetSpeedField();
-        Vector3 mouse = this.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //Vector3 mouse = this.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mouse = SpeedChangeOBJ.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouse.z = -3.0f;
         mouse.x = SpeedChangeOBJ.transform.position.x - 0.1f;
-        mouse.y = mouse.y * -1;
-        if(mouse.y <= -1.7f)
+        mouse.y *= -1;
+        if(mouse.y < -1.7f)
         {
             mouse.y = SpeedChangeOBJ.transform.position.y - 1.7f;
         }
-        if(1.7f <= mouse.y)
+        if(1.7f < mouse.y)
         {
-            //43
             mouse.y = SpeedChangeOBJ.transform.position.y + 1.7f;
         }
+        //Debug.Log(mouse);
         SpeedArrow.transform.position = mouse;
         SetSpeed((2.0f + mouse.y) * 20);
     }
@@ -292,23 +304,6 @@ public class HandBallScript : MonoBehaviour
         SpeedChangeOBJ.transform.position = SpeedPos;
     }
 
-    void MakeMoveBalls()
-    {
-        for (int i = 0; i < 15; i++) MoveBalls.Add(false);
-    }
-
-    public void SetMoveBalls(int index,bool isSleep)
-    {
-        Debug.Log("index" + index + "IsSleep" + isSleep);
-        MoveBalls[index] = isSleep;
-    }
-
-    bool IsAllSleeping()
-    {
-        foreach (bool ball in MoveBalls) if (!ball) return false;
-        return true;
-    }
-
     IEnumerator AllBallStop()
     {
         //Debug.Log("AllBallStop");
@@ -319,5 +314,7 @@ public class HandBallScript : MonoBehaviour
             Rigidbody2D rigidbody2D = ball.GetComponent<Rigidbody2D>();
             rigidbody2D.velocity = Vector2.zero;
         }
+        SetTrueIsAllBallsStop();
+        GoSecondStep();
     }
 }
