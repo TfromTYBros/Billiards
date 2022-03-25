@@ -22,6 +22,8 @@ public class HandBallScript : MonoBehaviour
     bool IsAllBallsStop = true;
 
     WaitForSeconds MoveStopTime = new WaitForSeconds(10.0f);
+    float SpeedDiffPos = 1.7f;
+    float ForemostPos = 3.0f;
 
     void Start()
     {
@@ -145,6 +147,7 @@ public class HandBallScript : MonoBehaviour
             StepRotation = false;
             StepSpeed = true;
             Que.SetActive(false);
+            SetSpeedField();
             currStep++;
         }
         else if (currStep == 2)
@@ -152,6 +155,7 @@ public class HandBallScript : MonoBehaviour
             StepHeadArea = false;
             StepRotation = false;
             StepSpeed = false;
+            //SpeedArrow.transform.position = new Vector3(SpeedChangeOBJ.transform.position.x, 0.0f, SpeedChangeOBJ.transform.position.z);
             SpeedChangeOBJ.SetActive(false);
             AddForce();
             SetFalseIsAllBallsStop();
@@ -268,23 +272,21 @@ public class HandBallScript : MonoBehaviour
     private void MouseFollowSpeed()
     {
         //Debug.Log("MouseFollowSpeed");
-        SetSpeedField();
-        //Vector3 mouse = this.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3 mouse = SpeedChangeOBJ.transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouse.z = -3.0f;
-        mouse.x = SpeedChangeOBJ.transform.position.x - 0.1f;
+        Vector3 speedFieldVec = GetSpeedFieldPos();
+        Vector3 mouse = speedFieldVec - Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouse.z = ForemostPos*-1;
+        mouse.x = speedFieldVec.x - 0.1f;
         mouse.y *= -1;
-        if(mouse.y < -1.7f)
+        if(mouse.y <= speedFieldVec.y - SpeedDiffPos)
         {
-            mouse.y = SpeedChangeOBJ.transform.position.y - 1.7f;
+            mouse.y = speedFieldVec.y - SpeedDiffPos;
         }
-        if(1.7f < mouse.y)
+        if(speedFieldVec.y + SpeedDiffPos <= mouse.y)
         {
-            mouse.y = SpeedChangeOBJ.transform.position.y + 1.7f;
+            mouse.y = speedFieldVec.y + SpeedDiffPos;
         }
-        //Debug.Log(mouse);
         SpeedArrow.transform.position = mouse;
-        SetSpeed((2.0f + mouse.y) * 20);
+        SetSpeed((2.0f + mouse.y) * 20.0f);
     }
 
     void SetSpeedField()
@@ -302,6 +304,11 @@ public class HandBallScript : MonoBehaviour
             SpeedPos.y = 0.0f;
         }
         SpeedChangeOBJ.transform.position = SpeedPos;
+    }
+
+    Vector3 GetSpeedFieldPos()
+    {
+        return SpeedChangeOBJ.transform.position;
     }
 
     IEnumerator AllBallStop()
