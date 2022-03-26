@@ -13,7 +13,7 @@ public class HandBallScript : MonoBehaviour
     bool StepSpeed = false;
     [SerializeField] int currStep = 0;
 
-    public GameObject SpeedChangeOBJ;
+    public GameObject SpeedFieldBox;
     public GameObject SpeedArrow;
     public GameObject CantTouchAreaBox;
     public GameObject Que;
@@ -21,15 +21,34 @@ public class HandBallScript : MonoBehaviour
 
     bool IsAllBallsStop = true;
 
-    WaitForSeconds MoveStopTime = new WaitForSeconds(10.0f);
-    float SpeedDiffPos = 1.7f;
-    float ForemostPos = 3.0f;
+    private readonly WaitForSeconds MoveStopTime = new WaitForSeconds(10.0f);
+    private readonly int First = 0;
+    private readonly int Second = 1;
+    private readonly int Third = 2;
+    private readonly int IntNothing = 0;
+
+    private readonly float SafeZonePosOnBoardX = 4.3f;
+    private readonly float SafeZonePosOnBoardY = 1.826f;
+
+    private readonly float BreakShotArea = 2.6f;
+    private readonly float BackPos = 1.0f;
+
+    private readonly float SafeZonePos = 1.5f;
+    private readonly float ScreenNear = -2.0f;
+    private readonly float Nothing = 0.0f;
+
+    private readonly float SpeedDiffPos = 1.7f;
+    private readonly float ForemostPos = 3.0f;
+    private readonly float AdJustMent = 0.1f;
+    private readonly float ReverseNum = -1.0f;
+    private readonly float BaseSpeed = 1.8f;
+    private readonly float Magnification = 20.0f;
 
     void Start()
     {
         rigidbody2D = this.GetComponent<Rigidbody2D>();
-        CantTouchAreaBox.SetActive(true);
-        SetBreakShotTrue();
+        TrueCantTouchAreaBox();
+        TrueBreakShot();
     }
 
     void Update()
@@ -42,6 +61,106 @@ public class HandBallScript : MonoBehaviour
         if (StepSpeed) MouseFollowSpeed();
     }
 
+    private void StepPlus()
+    {
+        currStep++;
+    }
+
+    private void StepDown()
+    {
+        currStep--;
+    }
+
+    private void TrueBreakShot()
+    {
+        BreakShot = true;
+    }
+
+    private void FalseBreakShot()
+    {
+        BreakShot = false;
+    }
+
+    private void TrueStepHeadArea()
+    {
+        StepHeadArea = true;
+    }
+
+    private void FalseStepHeadArea()
+    {
+        StepHeadArea = false;
+    }
+
+    private void TrueStepRotation()
+    {
+        StepRotation = true;
+    }
+
+    private void FalseStepRotation()
+    {
+        StepRotation = false;
+    }
+
+    private void TrueStepSpeed()
+    {
+        StepSpeed = true;
+    }
+
+    private void FalseStepSpeed()
+    {
+        StepSpeed = false;
+    }
+
+    private void TrueSpriteRenderer()
+    {
+        spriteRenderer.enabled = true;
+    }
+
+    private void FalseSpriteRenderer()
+    {
+        spriteRenderer.enabled = false;
+    }
+
+    private void SetTrueIsAllBallsStop()
+    {
+        IsAllBallsStop = true;
+    }
+
+    private void SetFalseIsAllBallsStop()
+    {
+        IsAllBallsStop = false;
+    }
+
+    private void TrueCantTouchAreaBox()
+    {
+        CantTouchAreaBox.SetActive(true);
+    }
+
+    private void FalseCantTouchAreaBox()
+    {
+        CantTouchAreaBox.SetActive(false);
+    }
+
+    private void TrueQue()
+    {
+        Que.SetActive(true);
+    }
+
+    private void FalseQue()
+    {
+        Que.SetActive(false);
+    }
+
+    private void TrueSpeedFieldBox()
+    {
+        SpeedFieldBox.SetActive(true);
+    }
+
+    private void FalseSpeedFieldBox()
+    {
+        SpeedFieldBox.SetActive(false);
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Hole"))
@@ -49,7 +168,7 @@ public class HandBallScript : MonoBehaviour
             //Debug.Log("HoleHitByHandBall");
             StopAllCoroutines();
             HandBallDisappear();
-            SetBreakShotFalse();
+            FalseBreakShot();
             StartCoroutine(RagGoFirstStep());
         }
     }
@@ -57,7 +176,7 @@ public class HandBallScript : MonoBehaviour
     void HandBallDisappear()
     {
         rigidbody2D.velocity = Vector2.zero;
-        spriteRenderer.enabled = false;
+        FalseSpriteRenderer();
     }
 
     void FreezeBalls()
@@ -82,22 +201,12 @@ public class HandBallScript : MonoBehaviour
 
     void AddForce()
     {
-        rigidbody2D.AddForce(new Vector3(ZtoX(), ZtoY(), 0.0f), ForceMode2D.Impulse);
+        rigidbody2D.AddForce(new Vector3(ZtoX(), ZtoY(), Nothing), ForceMode2D.Impulse);
     }
 
     public void SetSpeed(float speedValue)
     {
         speed = speedValue;
-    }
-
-    void SetBreakShotTrue()
-    {
-        BreakShot = true;
-    }
-
-    void SetBreakShotFalse()
-    {
-        BreakShot = false;
     }
 
     private float ZtoX()
@@ -131,32 +240,36 @@ public class HandBallScript : MonoBehaviour
 
     private void StepMove()
     {
-        if (currStep == 0)
+        if (currStep == First)
         {
             StopAllCoroutines();
-            StepHeadArea = false;
-            StepRotation = true;
-            StepSpeed = false;
-            CantTouchAreaBox.SetActive(false);
-            currStep++;
+
+            FalseStepHeadArea();
+            TrueStepRotation();
+            FalseStepSpeed();
+
+            FalseCantTouchAreaBox();
+            StepPlus();
         }
-        else if (currStep == 1)
+        else if (currStep == Second)
         {
             DecompressionBalls();
-            StepHeadArea = false;
-            StepRotation = false;
-            StepSpeed = true;
-            Que.SetActive(false);
+
+            FalseStepHeadArea();
+            FalseStepRotation();
+            TrueStepSpeed();
+
+            FalseQue();
             SetSpeedField();
-            currStep++;
+            StepPlus();
         }
-        else if (currStep == 2)
+        else if (currStep == Third)
         {
-            StepHeadArea = false;
-            StepRotation = false;
-            StepSpeed = false;
-            //SpeedArrow.transform.position = new Vector3(SpeedChangeOBJ.transform.position.x, 0.0f, SpeedChangeOBJ.transform.position.z);
-            SpeedChangeOBJ.SetActive(false);
+            FalseStepHeadArea();
+            FalseStepRotation();
+            FalseStepSpeed();
+
+            FalseSpeedFieldBox();
             AddForce();
             SetFalseIsAllBallsStop();
             StartCoroutine(AllBallStop());
@@ -165,33 +278,35 @@ public class HandBallScript : MonoBehaviour
 
     void StepReMove()
     {
-        if (2 <= currStep || (!BreakShot && 1 <= currStep)) currStep--;
-        if (!BreakShot && currStep == 0)
+        if (Third <= currStep || (!BreakShot && Second <= currStep)) StepDown();
+        if (!BreakShot && currStep == First)
         {
             FreezeBalls();
-            StepHeadArea = true;
-            StepRotation = false;
-            StepSpeed = false;
-            Que.SetActive(false);
+
+            TrueStepHeadArea();
+            FalseStepRotation();
+            FalseStepSpeed();
+
+            FalseQue();
         }
-        else if (currStep == 1)
+        else if (currStep == Second)
         {
-            StepHeadArea = false;
-            StepRotation = true;
-            StepSpeed = false;
-            SpeedChangeOBJ.SetActive(false);
-            Que.SetActive(true);
+            FalseStepHeadArea();
+            TrueStepRotation();
+            FalseStepSpeed();
+            FalseSpeedFieldBox();
+            TrueQue();
         }
     }
 
     private void GoSecondStep()
     {
         //IsAllBallsStop‚ÍAllBallStop()‚ÅŽÀ‘•Ï‚ÝB
-        spriteRenderer.enabled = true;
-        StepHeadArea = false;
-        StepRotation = true;
-        StepSpeed = false;
-        currStep = 1;
+        TrueSpriteRenderer();
+        FalseStepHeadArea();
+        TrueStepRotation();
+        FalseStepSpeed();
+        currStep = Second;
     }
 
     private IEnumerator RagGoFirstStep()
@@ -199,42 +314,32 @@ public class HandBallScript : MonoBehaviour
         yield return MoveStopTime;
         SetTrueIsAllBallsStop();
         FreezeBalls();
-        StepHeadArea = true;
-        StepRotation = false;
-        StepSpeed = false;
-        currStep = 0;
-    }
-
-    void SetTrueIsAllBallsStop()
-    {
-        IsAllBallsStop = true;
-    }
-
-    void SetFalseIsAllBallsStop()
-    {
-        IsAllBallsStop = false;
+        TrueStepHeadArea();
+        FalseStepRotation();
+        FalseStepSpeed();
+        currStep = IntNothing;
     }
 
     private void MouseFollowHeadSpotArea()
     {
         Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        if (mouse.x <= -4.3f)
+        if (mouse.x <= -SafeZonePosOnBoardX)
         {
-            mouse.x = -4.3f;
+            mouse.x = -SafeZonePosOnBoardX;
         }
-        if (-2.6f <= mouse.x)
+        if (-BreakShotArea <= mouse.x)
         {
-            mouse.x = -2.6f;
+            mouse.x = -BreakShotArea;
         }
-        if (mouse.y <= -1.825f)
+        if (mouse.y <= -SafeZonePosOnBoardY)
         {
-            mouse.y = -1.826f;
+            mouse.y = -SafeZonePosOnBoardY;
         }
-        if (1.825f <= mouse.y)
+        if (SafeZonePosOnBoardY <= mouse.y)
         {
-            mouse.y = 1.825f;
+            mouse.y = SafeZonePosOnBoardY;
         }
-        mouse.z = 1.0f;
+        mouse.z = BackPos;
         this.gameObject.transform.position = mouse;
     }
 
@@ -243,21 +348,21 @@ public class HandBallScript : MonoBehaviour
         spriteRenderer.enabled = true;
         Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         this.gameObject.transform.position = mouse;
-        if (mouse.x <= -4.3f)
+        if (mouse.x <= -SafeZonePosOnBoardX)
         {
-            mouse.x = -4.3f;
+            mouse.x = -SafeZonePosOnBoardX;
         }
-        if (4.3f <= mouse.x)
+        if (SafeZonePosOnBoardX <= mouse.x)
         {
-            mouse.x = 4.3f;
+            mouse.x = SafeZonePosOnBoardX;
         }
-        if (mouse.y <= -1.825f)
+        if (mouse.y <= -SafeZonePosOnBoardY)
         {
-            mouse.y = -1.826f;
+            mouse.y = -SafeZonePosOnBoardY;
         }
-        if (1.825f <= mouse.y)
+        if (SafeZonePosOnBoardY <= mouse.y)
         {
-            mouse.y = 1.825f;
+            mouse.y = SafeZonePosOnBoardY;
         }
         this.gameObject.transform.position = mouse;
     }
@@ -273,10 +378,9 @@ public class HandBallScript : MonoBehaviour
     {
         //Debug.Log("MouseFollowSpeed");
         Vector3 speedFieldVec = GetSpeedFieldPos();
-        Vector3 mouse = speedFieldVec - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouse.z = ForemostPos*-1;
-        mouse.x = speedFieldVec.x - 0.1f;
-        mouse.y *= -1;
+        Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouse.z = ForemostPos * ReverseNum;
+        mouse.x = speedFieldVec.x - AdJustMent;
         if(mouse.y <= speedFieldVec.y - SpeedDiffPos)
         {
             mouse.y = speedFieldVec.y - SpeedDiffPos;
@@ -286,29 +390,29 @@ public class HandBallScript : MonoBehaviour
             mouse.y = speedFieldVec.y + SpeedDiffPos;
         }
         SpeedArrow.transform.position = mouse;
-        SetSpeed((2.0f + mouse.y) * 20.0f);
+        SetSpeed((BaseSpeed + mouse.y) * Magnification);
     }
 
-    void SetSpeedField()
+    private void SetSpeedField()
     {
-        SpeedChangeOBJ.SetActive(true);
-        SpeedChangeOBJ.transform.rotation = Quaternion.identity;
-        Vector3 SpeedPos = SpeedChangeOBJ.transform.position;
-        SpeedPos.z = -2.0f;
-        if (this.transform.position.y <= -1.5f)
+        TrueSpeedFieldBox();
+        SpeedFieldBox.transform.rotation = Quaternion.identity;
+        Vector3 SpeedPos = SpeedFieldBox.transform.position;
+        SpeedPos.z = ScreenNear;
+        if (this.transform.position.y <= -SafeZonePos)
         {
-            SpeedPos.y = 0.0f;
+            SpeedPos.y = Nothing;
         }
-        if(1.5f <= this.transform.position.y)
+        if(SafeZonePos <= this.transform.position.y)
         {
-            SpeedPos.y = 0.0f;
+            SpeedPos.y = Nothing;
         }
-        SpeedChangeOBJ.transform.position = SpeedPos;
+        SpeedFieldBox.transform.position = SpeedPos;
     }
 
-    Vector3 GetSpeedFieldPos()
+    private Vector3 GetSpeedFieldPos()
     {
-        return SpeedChangeOBJ.transform.position;
+        return SpeedFieldBox.transform.position;
     }
 
     IEnumerator AllBallStop()
