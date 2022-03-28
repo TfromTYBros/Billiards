@@ -46,11 +46,11 @@ public class HandBallScript : MonoBehaviour
     private readonly float BACK_POS = 1.0f;
 
     private readonly float SAFEZONE_POS = 1.5f;
-    private readonly float SCREEN_NEAR = -2.0f;
+    private readonly float SCREEN_NEAR = 3.0f;
     private readonly float NOTHING_F = 0.0f;
 
     private readonly float SPEEDDIFF_POS = 1.7f;
-    private readonly float FOREMOST_POS = -3.0f;
+    private readonly float FOREMOST_POS = 2.0f;
     private readonly float ADJUSTMENT = 0.1f;
     private readonly float REVERSE_NUM = -1.0f;
     private readonly float BASE_SPEED = 2.0f;
