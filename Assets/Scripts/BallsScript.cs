@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class BallsScript : MonoBehaviour
 {
+    HandBallScript HBS;
+
+    private void Start()
+    {
+        HBS = FindObjectOfType<HandBallScript>();
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.transform.CompareTag("Hole"))
@@ -11,8 +18,14 @@ public class BallsScript : MonoBehaviour
             Debug.Log("HoleHit" + this.gameObject.name);
             this.gameObject.SetActive(false);
         }
-    }
 
+        if (collision.gameObject.CompareTag("Cushion") && this.gameObject == HBS.GetCurrMinimumBall())
+        {
+            Debug.Log("CushionHit" + this.gameObject.name);
+            HBS.TrueClear_Cushion_CurrBall();
+        }
+    }
+    /*
     int ThisBallNumber()
     {
         string name = this.gameObject.name;
@@ -31,5 +44,5 @@ public class BallsScript : MonoBehaviour
         else if (name == "Ball12") return 12;
         else if (name == "Ball13") return 13;
         else return 14;
-    }
+    }*/
 }

@@ -14,19 +14,24 @@ public class HandBallScript : MonoBehaviour
     [SerializeField] int currStep = 0;
 
     public GameObject SpeedFieldBox;
+    public GameObject SpeedField;
     public GameObject SpeedArrow;
     public GameObject CantTouchAreaBox;
     public GameObject Que;
     public GameObject[] BallsOBJ;
 
     bool IsAllBallsStop = true;
+    bool FoulChecked = false;
+    [SerializeField] bool Clear_Minimum = false;
+    [SerializeField] bool Clear_Cushion_HandBall = false;
+    [SerializeField] bool Clear_Cushion_CurrBall = false;
+    [SerializeField] bool Clear_Cushion_MinimumBall = false;
 
     private readonly WaitForSeconds MoveStopTime = new WaitForSeconds(10.0f);
 
     private readonly int DEGREE_90 = 90;
     private readonly int DEGREE_180 = 180;
     private readonly int DEGREE_270 = 270;
-    private readonly int DEGREE_360 = 360;
     private readonly float DEGREE_360f = 360.0f;
 
     private readonly int FIRST = 0;
@@ -45,11 +50,22 @@ public class HandBallScript : MonoBehaviour
     private readonly float NOTHING_F = 0.0f;
 
     private readonly float SPEEDDIFF_POS = 1.7f;
-    private readonly float FOREMOST_POS = 3.0f;
+    private readonly float FOREMOST_POS = -3.0f;
     private readonly float ADJUSTMENT = 0.1f;
     private readonly float REVERSE_NUM = -1.0f;
-    private readonly float BASE_SPEED = 1.8f;
+    private readonly float BASE_SPEED = 2.0f;
     private readonly float MAGNIFICATION = 20.0f;
+
+    /*
+     *BreakShot以外で最小番号以外の的玉に当てたらファール
+     *的玉に当てた後、手玉か的玉がポケットに入るかクッションに当たらなければファール
+     *手玉が落ちたらファール
+     * 
+     * 最小番号の手玉確認メソッド
+     * 最小番号の手玉に当たったか、それ以外に当たったか確認するメソッド
+     * ノークッションを確認するメソッド
+     * ファールになったらペナルティがあって、フリーボールメソッドを呼び出すメソッド
+     */
 
     void Start()
     {
@@ -168,6 +184,46 @@ public class HandBallScript : MonoBehaviour
         SpeedFieldBox.SetActive(false);
     }
 
+    private void TrueFoulChecked()
+    {
+        FoulChecked = true;
+    }
+
+    private void FalseFoulChecked()
+    {
+        FoulChecked = false;
+    }
+
+    private void TrueClear_Minimum()
+    {
+        Clear_Minimum = true;
+    }
+
+    private void FalseClear_Minimum()
+    {
+        Clear_Minimum = false;
+    }
+
+    private void TrueClear_Cushion_HandBall()
+    {
+        Clear_Cushion_HandBall = true;
+    }
+
+    private void FalseClear_Cushion_HandBall()
+    {
+        Clear_Cushion_HandBall = false;
+    }
+
+    public void TrueClear_Cushion_CurrBall()
+    {
+        Clear_Cushion_CurrBall = true;
+    }
+
+    public void FalseClear_Cushion_CurrBall()
+    {
+        Clear_Cushion_CurrBall = false;
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Hole"))
@@ -175,8 +231,31 @@ public class HandBallScript : MonoBehaviour
             //Debug.Log("HoleHitByHandBall");
             StopAllCoroutines();
             HandBallDisappear();
-            FalseBreakShot();
-            StartCoroutine(RagGoFirstStep());
+            if (!BreakShot)
+            {
+                FalseClear_Cushion_HandBall();
+                FalseClear_Cushion_CurrBall();
+                FalseClear_Minimum();
+            }
+            StartCoroutine(RagIsFoul());
+        }
+
+        //BreakShot以外の時
+        if (!FoulChecked && currStep == THIRD && !collision.gameObject.CompareTag("Cushion") && !collision.gameObject.CompareTag("Hole") && !BreakShot && collision.gameObject != GetCurrMinimumBall())
+        {
+            TrueFoulChecked();
+            Debug.Log("FoulTouch");
+        }
+        else if (!FoulChecked && currStep == THIRD && !collision.gameObject.CompareTag("Cushion") && !collision.gameObject.CompareTag("Hole") && !BreakShot && collision.gameObject == GetCurrMinimumBall())
+        {
+            Debug.Log("NoFoul");
+            TrueClear_Minimum();
+            TrueFoulChecked();
+        }
+
+        if (Clear_Minimum && collision.gameObject.CompareTag("Cushion"))
+        {
+            TrueClear_Cushion_HandBall();
         }
     }
 
@@ -277,6 +356,7 @@ public class HandBallScript : MonoBehaviour
             FalseStepSpeed();
 
             FalseSpeedFieldBox();
+            FalseBreakShot();
             AddForce();
             SetFalseIsAllBallsStop();
             StartCoroutine(AllBallStop());
@@ -316,15 +396,20 @@ public class HandBallScript : MonoBehaviour
         currStep = SECOND;
     }
 
-    private IEnumerator RagGoFirstStep()
+    private void GoFirstStep()
     {
-        yield return MoveStopTime;
         SetTrueIsAllBallsStop();
         FreezeBalls();
         TrueStepHeadArea();
         FalseStepRotation();
         FalseStepSpeed();
         currStep = INT_NOTHING;
+    }
+
+    private IEnumerator RagIsFoul()
+    {
+        yield return MoveStopTime;
+        IsFoul();
     }
 
     private void MouseFollowHeadSpotArea()
@@ -386,7 +471,7 @@ public class HandBallScript : MonoBehaviour
         //Debug.Log("MouseFollowSpeed");
         Vector3 speedFieldVec = GetSpeedFieldPos();
         Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouse.z = FOREMOST_POS * REVERSE_NUM;
+        mouse.z = FOREMOST_POS;
         mouse.x = speedFieldVec.x - ADJUSTMENT;
         if(mouse.y <= speedFieldVec.y - SPEEDDIFF_POS)
         {
@@ -396,6 +481,7 @@ public class HandBallScript : MonoBehaviour
         {
             mouse.y = speedFieldVec.y + SPEEDDIFF_POS;
         }
+        //Debug.Log(mouse.y);
         SpeedArrow.transform.position = mouse;
         SetSpeed((BASE_SPEED + mouse.y) * MAGNIFICATION);
     }
@@ -415,6 +501,7 @@ public class HandBallScript : MonoBehaviour
             SpeedPos.y = NOTHING_F;
         }
         SpeedFieldBox.transform.position = SpeedPos;
+        SpeedField.transform.position = SpeedPos;
     }
 
     private Vector3 GetSpeedFieldPos()
@@ -433,6 +520,43 @@ public class HandBallScript : MonoBehaviour
             rigidbody2D.velocity = Vector2.zero;
         }
         SetTrueIsAllBallsStop();
-        GoSecondStep();
+        IsFoul();
+    }
+
+    private void IsFoul()
+    {
+        //Debug.Log("IsFoul");
+        if ((Clear_Cushion_HandBall || Clear_Cushion_CurrBall) && Clear_Minimum)
+        {
+            FalseFoulChecked();
+            FalseClear_Cushion_HandBall();
+            FalseClear_Cushion_CurrBall();
+            FalseClear_Minimum();
+            GoSecondStep();
+        }
+        else
+        {
+            Debug.Log("Foul");
+            //ペナルティ
+
+            FalseFoulChecked();
+            FalseClear_Cushion_HandBall();
+            FalseClear_Cushion_CurrBall();
+            FalseClear_Minimum();
+            GoFirstStep();
+        }
+    }
+
+    public GameObject GetCurrMinimumBall()
+    {
+        foreach(GameObject ball in BallsOBJ)
+        {
+            if(ball.activeSelf == true)
+            {
+                return ball;
+            }
+        }
+
+        return null;
     }
 }
