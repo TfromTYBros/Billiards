@@ -22,27 +22,34 @@ public class HandBallScript : MonoBehaviour
     bool IsAllBallsStop = true;
 
     private readonly WaitForSeconds MoveStopTime = new WaitForSeconds(10.0f);
-    private readonly int First = 0;
-    private readonly int Second = 1;
-    private readonly int Third = 2;
-    private readonly int IntNothing = 0;
 
-    private readonly float SafeZonePosOnBoardX = 4.3f;
-    private readonly float SafeZonePosOnBoardY = 1.826f;
+    private readonly int DEGREE_90 = 90;
+    private readonly int DEGREE_180 = 180;
+    private readonly int DEGREE_270 = 270;
+    private readonly int DEGREE_360 = 360;
+    private readonly float DEGREE_360f = 360.0f;
 
-    private readonly float BreakShotArea = 2.6f;
-    private readonly float BackPos = 1.0f;
+    private readonly int FIRST = 0;
+    private readonly int SECOND = 1;
+    private readonly int THIRD = 2;
+    private readonly int INT_NOTHING = 0;
 
-    private readonly float SafeZonePos = 1.5f;
-    private readonly float ScreenNear = -2.0f;
-    private readonly float Nothing = 0.0f;
+    private readonly float SAFE_ZONE_POS_ON_BOARD_X = 4.3f;
+    private readonly float SAFE_ZONE_POS_ON_BOARD_Y = 1.826f;
 
-    private readonly float SpeedDiffPos = 1.7f;
-    private readonly float ForemostPos = 3.0f;
-    private readonly float AdJustMent = 0.1f;
-    private readonly float ReverseNum = -1.0f;
-    private readonly float BaseSpeed = 1.8f;
-    private readonly float Magnification = 20.0f;
+    private readonly float BREAKSHOT_AREA = 2.6f;
+    private readonly float BACK_POS = 1.0f;
+
+    private readonly float SAFEZONE_POS = 1.5f;
+    private readonly float SCREEN_NEAR = -2.0f;
+    private readonly float NOTHING_F = 0.0f;
+
+    private readonly float SPEEDDIFF_POS = 1.7f;
+    private readonly float FOREMOST_POS = 3.0f;
+    private readonly float ADJUSTMENT = 0.1f;
+    private readonly float REVERSE_NUM = -1.0f;
+    private readonly float BASE_SPEED = 1.8f;
+    private readonly float MAGNIFICATION = 20.0f;
 
     void Start()
     {
@@ -201,7 +208,7 @@ public class HandBallScript : MonoBehaviour
 
     void AddForce()
     {
-        rigidbody2D.AddForce(new Vector3(ZtoX(), ZtoY(), Nothing), ForceMode2D.Impulse);
+        rigidbody2D.AddForce(new Vector3(ZtoX(), ZtoY(), NOTHING_F), ForceMode2D.Impulse);
     }
 
     public void SetSpeed(float speedValue)
@@ -211,36 +218,36 @@ public class HandBallScript : MonoBehaviour
 
     private float ZtoX()
     {
-        float ballz = this.gameObject.transform.localEulerAngles.z % 360.0f;
-        if (90 <= ballz && ballz <= 270)
+        float ballz = this.gameObject.transform.localEulerAngles.z % DEGREE_360f;
+        if (DEGREE_90 <= ballz && ballz <= DEGREE_270)
         {
-            return speed * (Mathf.Abs((ballz % 180) - 90) / 90) * -1;
+            return speed * (Mathf.Abs((ballz % DEGREE_180) - DEGREE_90) / DEGREE_90) * REVERSE_NUM;
         }
         else
         {
-            return speed * (Mathf.Abs((ballz % 180) - 90) / 90);
+            return speed * (Mathf.Abs((ballz % DEGREE_180) - DEGREE_90) / DEGREE_90);
         }
     }
 
     private float ZtoY()
     {
-        float ballz = this.gameObject.transform.localEulerAngles.z % 360.0f;
+        float ballz = this.gameObject.transform.localEulerAngles.z % DEGREE_360f;
         //Debug.Log("ballz: " + ballz);
-        if (0 <= ballz && ballz <= 180)
+        if (INT_NOTHING <= ballz && ballz <= DEGREE_180)
         {
             //Debug.Log("0 <= 180");
-            return speed - (speed * (Mathf.Abs((ballz % 180) - 90) / 90));
+            return speed - (speed * (Mathf.Abs((ballz % DEGREE_180) - DEGREE_90) / DEGREE_90));
         }
         else
         {
             //Debug.Log("180 <= 360");
-            return (speed - (speed * (Mathf.Abs((ballz % 180) - 90) / 90))) * -1;
+            return (speed - (speed * (Mathf.Abs((ballz % DEGREE_180) - DEGREE_90) / DEGREE_90))) * REVERSE_NUM;
         }
     }
 
     private void StepMove()
     {
-        if (currStep == First)
+        if (currStep == FIRST)
         {
             StopAllCoroutines();
 
@@ -251,7 +258,7 @@ public class HandBallScript : MonoBehaviour
             FalseCantTouchAreaBox();
             StepPlus();
         }
-        else if (currStep == Second)
+        else if (currStep == SECOND)
         {
             DecompressionBalls();
 
@@ -263,7 +270,7 @@ public class HandBallScript : MonoBehaviour
             SetSpeedField();
             StepPlus();
         }
-        else if (currStep == Third)
+        else if (currStep == THIRD)
         {
             FalseStepHeadArea();
             FalseStepRotation();
@@ -278,8 +285,8 @@ public class HandBallScript : MonoBehaviour
 
     void StepReMove()
     {
-        if (Third <= currStep || (!BreakShot && Second <= currStep)) StepDown();
-        if (!BreakShot && currStep == First)
+        if (THIRD <= currStep || (!BreakShot && SECOND <= currStep)) StepDown();
+        if (!BreakShot && currStep == FIRST)
         {
             FreezeBalls();
 
@@ -289,7 +296,7 @@ public class HandBallScript : MonoBehaviour
 
             FalseQue();
         }
-        else if (currStep == Second)
+        else if (currStep == SECOND)
         {
             FalseStepHeadArea();
             TrueStepRotation();
@@ -306,7 +313,7 @@ public class HandBallScript : MonoBehaviour
         FalseStepHeadArea();
         TrueStepRotation();
         FalseStepSpeed();
-        currStep = Second;
+        currStep = SECOND;
     }
 
     private IEnumerator RagGoFirstStep()
@@ -317,29 +324,29 @@ public class HandBallScript : MonoBehaviour
         TrueStepHeadArea();
         FalseStepRotation();
         FalseStepSpeed();
-        currStep = IntNothing;
+        currStep = INT_NOTHING;
     }
 
     private void MouseFollowHeadSpotArea()
     {
         Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        if (mouse.x <= -SafeZonePosOnBoardX)
+        if (mouse.x <= -SAFE_ZONE_POS_ON_BOARD_X)
         {
-            mouse.x = -SafeZonePosOnBoardX;
+            mouse.x = -SAFE_ZONE_POS_ON_BOARD_X;
         }
-        if (-BreakShotArea <= mouse.x)
+        if (-BREAKSHOT_AREA <= mouse.x)
         {
-            mouse.x = -BreakShotArea;
+            mouse.x = -BREAKSHOT_AREA;
         }
-        if (mouse.y <= -SafeZonePosOnBoardY)
+        if (mouse.y <= -SAFE_ZONE_POS_ON_BOARD_Y)
         {
-            mouse.y = -SafeZonePosOnBoardY;
+            mouse.y = -SAFE_ZONE_POS_ON_BOARD_Y;
         }
-        if (SafeZonePosOnBoardY <= mouse.y)
+        if (SAFE_ZONE_POS_ON_BOARD_Y <= mouse.y)
         {
-            mouse.y = SafeZonePosOnBoardY;
+            mouse.y = SAFE_ZONE_POS_ON_BOARD_Y;
         }
-        mouse.z = BackPos;
+        mouse.z = BACK_POS;
         this.gameObject.transform.position = mouse;
     }
 
@@ -348,21 +355,21 @@ public class HandBallScript : MonoBehaviour
         spriteRenderer.enabled = true;
         Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         this.gameObject.transform.position = mouse;
-        if (mouse.x <= -SafeZonePosOnBoardX)
+        if (mouse.x <= -SAFE_ZONE_POS_ON_BOARD_X)
         {
-            mouse.x = -SafeZonePosOnBoardX;
+            mouse.x = -SAFE_ZONE_POS_ON_BOARD_X;
         }
-        if (SafeZonePosOnBoardX <= mouse.x)
+        if (SAFE_ZONE_POS_ON_BOARD_X <= mouse.x)
         {
-            mouse.x = SafeZonePosOnBoardX;
+            mouse.x = SAFE_ZONE_POS_ON_BOARD_X;
         }
-        if (mouse.y <= -SafeZonePosOnBoardY)
+        if (mouse.y <= -SAFE_ZONE_POS_ON_BOARD_Y)
         {
-            mouse.y = -SafeZonePosOnBoardY;
+            mouse.y = -SAFE_ZONE_POS_ON_BOARD_Y;
         }
-        if (SafeZonePosOnBoardY <= mouse.y)
+        if (SAFE_ZONE_POS_ON_BOARD_Y <= mouse.y)
         {
-            mouse.y = SafeZonePosOnBoardY;
+            mouse.y = SAFE_ZONE_POS_ON_BOARD_Y;
         }
         this.gameObject.transform.position = mouse;
     }
@@ -379,18 +386,18 @@ public class HandBallScript : MonoBehaviour
         //Debug.Log("MouseFollowSpeed");
         Vector3 speedFieldVec = GetSpeedFieldPos();
         Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouse.z = ForemostPos * ReverseNum;
-        mouse.x = speedFieldVec.x - AdJustMent;
-        if(mouse.y <= speedFieldVec.y - SpeedDiffPos)
+        mouse.z = FOREMOST_POS * REVERSE_NUM;
+        mouse.x = speedFieldVec.x - ADJUSTMENT;
+        if(mouse.y <= speedFieldVec.y - SPEEDDIFF_POS)
         {
-            mouse.y = speedFieldVec.y - SpeedDiffPos;
+            mouse.y = speedFieldVec.y - SPEEDDIFF_POS;
         }
-        if(speedFieldVec.y + SpeedDiffPos <= mouse.y)
+        if(speedFieldVec.y + SPEEDDIFF_POS <= mouse.y)
         {
-            mouse.y = speedFieldVec.y + SpeedDiffPos;
+            mouse.y = speedFieldVec.y + SPEEDDIFF_POS;
         }
         SpeedArrow.transform.position = mouse;
-        SetSpeed((BaseSpeed + mouse.y) * Magnification);
+        SetSpeed((BASE_SPEED + mouse.y) * MAGNIFICATION);
     }
 
     private void SetSpeedField()
@@ -398,14 +405,14 @@ public class HandBallScript : MonoBehaviour
         TrueSpeedFieldBox();
         SpeedFieldBox.transform.rotation = Quaternion.identity;
         Vector3 SpeedPos = SpeedFieldBox.transform.position;
-        SpeedPos.z = ScreenNear;
-        if (this.transform.position.y <= -SafeZonePos)
+        SpeedPos.z = SCREEN_NEAR;
+        if (this.transform.position.y <= -SAFEZONE_POS)
         {
-            SpeedPos.y = Nothing;
+            SpeedPos.y = NOTHING_F;
         }
-        if(SafeZonePos <= this.transform.position.y)
+        if(SAFEZONE_POS <= this.transform.position.y)
         {
-            SpeedPos.y = Nothing;
+            SpeedPos.y = NOTHING_F;
         }
         SpeedFieldBox.transform.position = SpeedPos;
     }
