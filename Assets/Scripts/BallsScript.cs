@@ -23,6 +23,7 @@ public class BallsScript : MonoBehaviour
         {
             Debug.Log("CushionHit" + this.gameObject.name);
             HBS.TrueClear_Cushion_CurrBall();
+            HBS.CushionHitCountUp();
         }
     }
     /*

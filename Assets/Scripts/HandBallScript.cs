@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class HandBallScript : MonoBehaviour
 {
+    HeartScript heartScript;
+    TimerScript timerScript;
     public SpriteRenderer spriteRenderer;
     new Rigidbody2D rigidbody2D;
     [SerializeField] float speed = 0.0f;
@@ -12,6 +14,7 @@ public class HandBallScript : MonoBehaviour
     bool StepRotation = false;
     bool StepSpeed = false;
     [SerializeField] int currStep = 0;
+    [SerializeField] int CushionHitCount = 0;
 
     public GameObject SpeedFieldBox;
     public GameObject SpeedField;
@@ -28,6 +31,8 @@ public class HandBallScript : MonoBehaviour
     [SerializeField] bool Clear_Cushion_MinimumBall = false;
 
     private readonly WaitForSeconds MoveStopTime = new WaitForSeconds(10.0f);
+    bool CoroutineNow = false;
+    bool Damaged = false;
 
     private readonly int DEGREE_90 = 90;
     private readonly int DEGREE_180 = 180;
@@ -43,7 +48,7 @@ public class HandBallScript : MonoBehaviour
     private readonly float SAFE_ZONE_POS_ON_BOARD_Y = 1.826f;
 
     private readonly float BREAKSHOT_AREA = 2.6f;
-    private readonly float BACK_POS = 1.0f;
+    private readonly float HANDBALL_POS = 4.0f;
 
     private readonly float SAFEZONE_POS = 1.5f;
     private readonly float SCREEN_NEAR = 3.0f;
@@ -56,20 +61,11 @@ public class HandBallScript : MonoBehaviour
     private readonly float BASE_SPEED = 2.0f;
     private readonly float MAGNIFICATION = 20.0f;
 
-    /*
-     *BreakShot以外で最小番号以外の的玉に当てたらファール
-     *的玉に当てた後、手玉か的玉がポケットに入るかクッションに当たらなければファール
-     *手玉が落ちたらファール
-     * 
-     * 最小番号の手玉確認メソッド
-     * 最小番号の手玉に当たったか、それ以外に当たったか確認するメソッド
-     * ノークッションを確認するメソッド
-     * ファールになったらペナルティがあって、フリーボールメソッドを呼び出すメソッド
-     */
-
     void Start()
     {
         rigidbody2D = this.GetComponent<Rigidbody2D>();
+        heartScript = FindObjectOfType<HeartScript>();
+        timerScript = FindObjectOfType<TimerScript>();
         TrueCantTouchAreaBox();
         TrueBreakShot();
     }
@@ -224,6 +220,31 @@ public class HandBallScript : MonoBehaviour
         Clear_Cushion_CurrBall = false;
     }
 
+    private void TrueCoroutineNow()
+    {
+        CoroutineNow = true;
+    }
+
+    private void FalseCoroutineNow()
+    {
+        CoroutineNow = false;
+    }
+
+    public bool GetCoroutineNow()
+    {
+        return CoroutineNow;
+    }
+
+    private void TrueDamaged()
+    {
+        Damaged = true;
+    }
+
+    private void FalseDamaged()
+    {
+        Damaged = false;
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Hole"))
@@ -232,6 +253,13 @@ public class HandBallScript : MonoBehaviour
             StopAllCoroutines();
             HandBallDisappear();
             if (!BreakShot)
+            {
+                FalseClear_Cushion_HandBall();
+                FalseClear_Cushion_CurrBall();
+                FalseClear_Minimum();
+                DamageMethod();
+            }
+            else
             {
                 FalseClear_Cushion_HandBall();
                 FalseClear_Cushion_CurrBall();
@@ -356,10 +384,11 @@ public class HandBallScript : MonoBehaviour
             FalseStepSpeed();
 
             FalseSpeedFieldBox();
-            FalseBreakShot();
+            //FalseBreakShot();
             AddForce();
             SetFalseIsAllBallsStop();
             StartCoroutine(AllBallStop());
+            TrueCoroutineNow();
         }
     }
 
@@ -394,6 +423,7 @@ public class HandBallScript : MonoBehaviour
         TrueStepRotation();
         FalseStepSpeed();
         currStep = SECOND;
+        timerScript.ResetTimer();
     }
 
     private void GoFirstStep()
@@ -404,6 +434,7 @@ public class HandBallScript : MonoBehaviour
         FalseStepRotation();
         FalseStepSpeed();
         currStep = INT_NOTHING;
+        timerScript.ResetTimer();
     }
 
     private IEnumerator RagIsFoul()
@@ -431,14 +462,15 @@ public class HandBallScript : MonoBehaviour
         {
             mouse.y = SAFE_ZONE_POS_ON_BOARD_Y;
         }
-        mouse.z = BACK_POS;
+        mouse.z = HANDBALL_POS;
         this.gameObject.transform.position = mouse;
     }
 
     private void FreeBall()
     {
         spriteRenderer.enabled = true;
-        Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouse.z = HANDBALL_POS;
         this.gameObject.transform.position = mouse;
         if (mouse.x <= -SAFE_ZONE_POS_ON_BOARD_X)
         {
@@ -525,8 +557,29 @@ public class HandBallScript : MonoBehaviour
 
     private void IsFoul()
     {
+        FalseCoroutineNow();
         //Debug.Log("IsFoul");
-        if ((Clear_Cushion_HandBall || Clear_Cushion_CurrBall) && Clear_Minimum)
+        if (BreakShot)
+        {
+            FalseBreakShot();
+            if (IsSafeOnBreakShot())
+            {
+                FalseFoulChecked();
+                FalseClear_Cushion_HandBall();
+                FalseClear_Cushion_CurrBall();
+                FalseClear_Minimum();
+                GoSecondStep();
+            }
+            else
+            {
+                FalseFoulChecked();
+                FalseClear_Cushion_HandBall();
+                FalseClear_Cushion_CurrBall();
+                FalseClear_Minimum();
+                GoFirstStep();
+            }
+        }
+        else if ((Clear_Cushion_HandBall || Clear_Cushion_CurrBall) && Clear_Minimum)
         {
             FalseFoulChecked();
             FalseClear_Cushion_HandBall();
@@ -538,6 +591,7 @@ public class HandBallScript : MonoBehaviour
         {
             Debug.Log("Foul");
             //ペナルティ
+            if (!Damaged) DamageMethod();
 
             FalseFoulChecked();
             FalseClear_Cushion_HandBall();
@@ -545,6 +599,7 @@ public class HandBallScript : MonoBehaviour
             FalseClear_Minimum();
             GoFirstStep();
         }
+        FalseDamaged();
     }
 
     public GameObject GetCurrMinimumBall()
@@ -556,7 +611,25 @@ public class HandBallScript : MonoBehaviour
                 return ball;
             }
         }
-
         return null;
+    }
+
+    public void CushionHitCountUp()
+    {
+        Debug.Log("CushionHitCountUp");
+        CushionHitCount++;
+    }
+
+    bool IsSafeOnBreakShot()
+    {
+        if (CushionHitCount < 3) return false;
+        if (!Clear_Cushion_CurrBall && !Clear_Cushion_HandBall && !Clear_Minimum) return false;
+        return true;
+    }
+
+    void DamageMethod()
+    {
+        heartScript.LifeSpriteChange();
+        TrueDamaged();
     }
 }
