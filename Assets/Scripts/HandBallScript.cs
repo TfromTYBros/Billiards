@@ -80,8 +80,10 @@ public class HandBallScript : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space)) RackMold();
 
-        if (Input.GetMouseButtonDown(0) && IsAllBallsStop) StepMove();
-        if (Input.GetMouseButtonDown(1) && IsAllBallsStop) StepReMove();
+        if (Input.GetMouseButtonDown(0) && IsAllBallsStop && !heartScript.LifeSafe()) ReStartGame();
+        
+        if (Input.GetMouseButtonDown(0) && IsAllBallsStop && heartScript.LifeSafe()) StepMove();
+        if (Input.GetMouseButtonDown(1) && IsAllBallsStop && heartScript.LifeSafe()) StepReMove();
         if (BreakShot && StepHeadArea) MouseFollowHeadSpotArea();
         else if (!BreakShot && StepHeadArea) FreeBall();
         if (StepRotation) MouseFollowRotation();
@@ -90,12 +92,12 @@ public class HandBallScript : MonoBehaviour
 
     private void StepPlus()
     {
-        currStep++;
+        if (currStep < THIRD)currStep++;
     }
 
     private void StepDown()
     {
-        currStep--;
+        if (FIRST < currStep)currStep--;
     }
 
     private void TrueBreakShot()
@@ -391,8 +393,9 @@ public class HandBallScript : MonoBehaviour
 
     void StepReMove()
     {
-        if (THIRD <= currStep || (!BreakShot && SECOND <= currStep)) StepDown();
-        if (!BreakShot && currStep == FIRST)
+        //if (THIRD <= currStep || (!BreakShot && SECOND <= currStep)) StepDown();
+        StepDown();
+        if (currStep == FIRST)
         {
             FreezeBalls();
 
@@ -401,6 +404,7 @@ public class HandBallScript : MonoBehaviour
             FalseStepSpeed();
 
             FalseQue();
+            if (BreakShot) CantTouchAreaBox.SetActive(true);
         }
         else if (currStep == SECOND)
         {
@@ -549,44 +553,24 @@ public class HandBallScript : MonoBehaviour
     private void CleanUp()
     {
         FalseCoroutineNow();
+        FalseFoulChecked();
+        FalseClear_Cushion_HandBall();
+        FalseClear_Cushion_CurrBall();
+        FalseClear_Minimum();
         if (BreakShot)
         {
             FalseBreakShot();
-            if (IsSafeOnBreakShot())
-            {
-                FalseFoulChecked();
-                FalseClear_Cushion_HandBall();
-                FalseClear_Cushion_CurrBall();
-                FalseClear_Minimum();
-                GoSecondStep();
-            }
-            else
-            {
-                FalseFoulChecked();
-                FalseClear_Cushion_HandBall();
-                FalseClear_Cushion_CurrBall();
-                FalseClear_Minimum();
-                GoFirstStep();
-            }
+            if (IsSafeOnBreakShot()) GoSecondStep();
+            else GoFirstStep();
         }
         else if ((Clear_Cushion_HandBall || Clear_Cushion_CurrBall) && Clear_Minimum)
         {
-            FalseFoulChecked();
-            FalseClear_Cushion_HandBall();
-            FalseClear_Cushion_CurrBall();
-            FalseClear_Minimum();
             IsGameOver(SECOND);
         }
         else
         {
-            Debug.Log("Foul");
-            //ペナルティ
+            //Debug.Log("Foul");
             if (!Damaged) DamageMethod();
-
-            FalseFoulChecked();
-            FalseClear_Cushion_HandBall();
-            FalseClear_Cushion_CurrBall();
-            FalseClear_Minimum();
             IsGameOver(FIRST);
         }
         FalseDamaged();
@@ -606,14 +590,13 @@ public class HandBallScript : MonoBehaviour
 
     public void CushionHitCountUp()
     {
-        Debug.Log("CushionHitCountUp");
+        //Debug.Log("CushionHitCountUp");
         CushionHitCount++;
     }
 
     bool IsSafeOnBreakShot()
     {
         if (CushionHitCount < 3) return false;
-        //if (!Clear_Cushion_CurrBall && !Clear_Cushion_HandBall && !Clear_Minimum) return false;
         return true;
     }
 
@@ -625,7 +608,7 @@ public class HandBallScript : MonoBehaviour
 
     void IsGameOver(int Step)
     {
-        if (heartScript.GetLifeCount() == 0) GameOver();
+        if (!heartScript.LifeSafe()) GameOver();
         else
         {
             if (Step == FIRST) GoFirstStep();
@@ -683,5 +666,10 @@ public class HandBallScript : MonoBehaviour
             ball.transform.position = BallsPosOnStart[index];
             index++;
         }
+    }
+
+    public void TestMethod()
+    {
+        Debug.Log("Text");
     }
 }

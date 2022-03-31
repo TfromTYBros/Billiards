@@ -36,6 +36,11 @@ public class HeartScript : MonoBehaviour
         return LifeCount;
     }
 
+    public bool LifeSafe()
+    {
+        return 0 < LifeCount;
+    }
+
     public void ResetLife()
     {
         SetMaxLife();
