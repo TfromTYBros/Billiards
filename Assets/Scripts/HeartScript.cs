@@ -6,6 +6,7 @@ public class HeartScript : MonoBehaviour
 {
     public GameObject[] Hearts;
     public Sprite AfterSprite;
+    public Sprite BeforeSprite;
     int LifeCount = 0;
     public SpriteRenderer[] spriteRenderers;
 
@@ -16,17 +17,28 @@ public class HeartScript : MonoBehaviour
 
     void SetMaxLife()
     {
-        LifeCount = 2;
+        LifeCount = 3;
     }
 
     public void LifeSpriteChange()
     {
-        spriteRenderers[LifeCount].sprite = AfterSprite;
+        spriteRenderers[LifeCount-1].sprite = AfterSprite;
         LifeDecrease();
     }
 
     void LifeDecrease()
     {
         LifeCount--;
+    }
+
+    public int GetLifeCount()
+    {
+        return LifeCount;
+    }
+
+    public void ResetLife()
+    {
+        SetMaxLife();
+        for (int i = 0; i < 3; i++) spriteRenderers[i].sprite = BeforeSprite;
     }
 }

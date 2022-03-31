@@ -21,7 +21,8 @@ public class HandBallScript : MonoBehaviour
     public GameObject SpeedArrow;
     public GameObject CantTouchAreaBox;
     public GameObject Que;
-    public GameObject[] BallsOBJ;
+    public GameObject[] BallsOBJ = new GameObject[15];
+    public Transform[] BallsPos = new Transform[15];
 
     bool IsAllBallsStop = true;
     bool FoulChecked = false;
@@ -33,6 +34,10 @@ public class HandBallScript : MonoBehaviour
     private readonly WaitForSeconds MoveStopTime = new WaitForSeconds(10.0f);
     bool CoroutineNow = false;
     bool Damaged = false;
+
+    public GameObject GameOverPanel;
+    Vector3[] BallsPosOnStart = new Vector3[15];
+    Vector3 StartHandBallPos = new Vector3(-2.7f,0.0f,4.0f);
 
     private readonly int DEGREE_90 = 90;
     private readonly int DEGREE_180 = 180;
@@ -68,10 +73,13 @@ public class HandBallScript : MonoBehaviour
         timerScript = FindObjectOfType<TimerScript>();
         TrueCantTouchAreaBox();
         TrueBreakShot();
+        SaveBallsPosOnStart();
     }
 
     void Update()
     {
+        if (Input.GetKey(KeyCode.Space)) RackMold();
+
         if (Input.GetMouseButtonDown(0) && IsAllBallsStop) StepMove();
         if (Input.GetMouseButtonDown(1) && IsAllBallsStop) StepReMove();
         if (BreakShot && StepHeadArea) MouseFollowHeadSpotArea();
@@ -250,22 +258,11 @@ public class HandBallScript : MonoBehaviour
         if (collision.gameObject.CompareTag("Hole"))
         {
             //Debug.Log("HoleHitByHandBall");
-            //StopAllCoroutines();
             HandBallDisappear();
-            if (!BreakShot)
-            {
-                FalseClear_Cushion_HandBall();
-                FalseClear_Cushion_CurrBall();
-                FalseClear_Minimum();
-                DamageMethod();
-            }
-            else
-            {
-                FalseClear_Cushion_HandBall();
-                FalseClear_Cushion_CurrBall();
-                FalseClear_Minimum();
-            }
-            //StartCoroutine(RagIsFoul());
+            if (!BreakShot && !Damaged) DamageMethod();
+            FalseClear_Cushion_HandBall();
+            FalseClear_Cushion_CurrBall();
+            FalseClear_Minimum();
         }
 
         //BreakShot以外の時
@@ -287,13 +284,13 @@ public class HandBallScript : MonoBehaviour
         }
     }
 
-    void HandBallDisappear()
+    private void HandBallDisappear()
     {
         rigidbody2D.velocity = Vector2.zero;
         FalseSpriteRenderer();
     }
 
-    void FreezeBalls()
+    private void FreezeBalls()
     {
         //Debug.Log("FreezeBalls");
         foreach(GameObject ball in BallsOBJ)
@@ -303,7 +300,7 @@ public class HandBallScript : MonoBehaviour
         }
     }
     
-    void DecompressionBalls()
+    private void DecompressionBalls()
     {
         //Debug.Log("DecompressionBalls");
         foreach(GameObject ball in BallsOBJ)
@@ -313,7 +310,7 @@ public class HandBallScript : MonoBehaviour
         }
     }
 
-    void AddForce()
+    private void AddForce()
     {
         rigidbody2D.AddForce(new Vector3(ZtoX(), ZtoY(), NOTHING_F), ForceMode2D.Impulse);
     }
@@ -433,14 +430,8 @@ public class HandBallScript : MonoBehaviour
         TrueStepHeadArea();
         FalseStepRotation();
         FalseStepSpeed();
-        currStep = INT_NOTHING;
+        currStep = FIRST;
         timerScript.ResetTimer();
-    }
-
-    private IEnumerator RagIsFoul()
-    {
-        yield return MoveStopTime;
-        IsFoul();
     }
 
     private void MouseFollowHeadSpotArea()
@@ -513,10 +504,7 @@ public class HandBallScript : MonoBehaviour
         {
             mouse.y = speedFieldVec.y + SPEEDDIFF_POS;
         }
-        //Debug.Log(mouse.y);
         SpeedArrow.transform.position = mouse;
-        Debug.Log(mouse);
-        Debug.Log(speedFieldVec);
         float Diff = speedFieldVec.y < 0 ? -speedFieldVec.y : speedFieldVec.y;
         SetSpeed((BASE_SPEED + mouse.y + Diff) * MAGNIFICATION);
     }
@@ -555,13 +543,12 @@ public class HandBallScript : MonoBehaviour
             rigidbody2D.velocity = Vector2.zero;
         }
         SetTrueIsAllBallsStop();
-        IsFoul();
+        CleanUp();
     }
 
-    private void IsFoul()
+    private void CleanUp()
     {
         FalseCoroutineNow();
-        //Debug.Log("IsFoul");
         if (BreakShot)
         {
             FalseBreakShot();
@@ -588,7 +575,7 @@ public class HandBallScript : MonoBehaviour
             FalseClear_Cushion_HandBall();
             FalseClear_Cushion_CurrBall();
             FalseClear_Minimum();
-            GoSecondStep();
+            IsGameOver(SECOND);
         }
         else
         {
@@ -600,7 +587,7 @@ public class HandBallScript : MonoBehaviour
             FalseClear_Cushion_HandBall();
             FalseClear_Cushion_CurrBall();
             FalseClear_Minimum();
-            GoFirstStep();
+            IsGameOver(FIRST);
         }
         FalseDamaged();
     }
@@ -634,5 +621,67 @@ public class HandBallScript : MonoBehaviour
     {
         heartScript.LifeSpriteChange();
         TrueDamaged();
+    }
+
+    void IsGameOver(int Step)
+    {
+        if (heartScript.GetLifeCount() == 0) GameOver();
+        else
+        {
+            if (Step == FIRST) GoFirstStep();
+            else if (Step == SECOND) GoSecondStep();
+        }
+    }
+
+    void GameOver()
+    {
+        Debug.Log("GameOver");
+        GameOverPanel.SetActive(true);
+    }
+
+    public void ReStartGame()
+    {
+        //球を定位置に移動
+        RackMold();
+
+        //全ての球をActiveTrue
+
+        //HandBallの定位置への移動
+
+        //HandBallを有効化
+
+        //timerのリセット？
+
+        //LifeCountのリセット
+        heartScript.ResetLife();
+
+        //BreakShotをTrue
+
+        //BreakshotなAreaをTrue
+
+        GameOverPanel.SetActive(false);
+    }
+
+    private void SaveBallsPosOnStart()
+    {
+        int index = 0;
+        foreach(Transform pos in BallsPos)
+        {
+            BallsPosOnStart[index] = pos.position;
+            index++;
+        }
+    }
+
+    private void RackMold()
+    {
+        Debug.Log("RackMold");
+        this.gameObject.transform.position = StartHandBallPos;
+        int index = 0;
+        foreach (GameObject ball in BallsOBJ)
+        {
+            ball.SetActive(true);
+            ball.transform.position = BallsPosOnStart[index];
+            index++;
+        }
     }
 }
