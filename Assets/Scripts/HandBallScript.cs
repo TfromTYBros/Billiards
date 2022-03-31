@@ -250,7 +250,7 @@ public class HandBallScript : MonoBehaviour
         if (collision.gameObject.CompareTag("Hole"))
         {
             //Debug.Log("HoleHitByHandBall");
-            StopAllCoroutines();
+            //StopAllCoroutines();
             HandBallDisappear();
             if (!BreakShot)
             {
@@ -265,7 +265,7 @@ public class HandBallScript : MonoBehaviour
                 FalseClear_Cushion_CurrBall();
                 FalseClear_Minimum();
             }
-            StartCoroutine(RagIsFoul());
+            //StartCoroutine(RagIsFoul());
         }
 
         //BreakShotˆÈŠO‚ÌŽž
@@ -515,7 +515,10 @@ public class HandBallScript : MonoBehaviour
         }
         //Debug.Log(mouse.y);
         SpeedArrow.transform.position = mouse;
-        SetSpeed((BASE_SPEED + mouse.y) * MAGNIFICATION);
+        Debug.Log(mouse);
+        Debug.Log(speedFieldVec);
+        float Diff = speedFieldVec.y < 0 ? -speedFieldVec.y : speedFieldVec.y;
+        SetSpeed((BASE_SPEED + mouse.y + Diff) * MAGNIFICATION);
     }
 
     private void SetSpeedField()
@@ -623,7 +626,7 @@ public class HandBallScript : MonoBehaviour
     bool IsSafeOnBreakShot()
     {
         if (CushionHitCount < 3) return false;
-        if (!Clear_Cushion_CurrBall && !Clear_Cushion_HandBall && !Clear_Minimum) return false;
+        //if (!Clear_Cushion_CurrBall && !Clear_Cushion_HandBall && !Clear_Minimum) return false;
         return true;
     }
 
