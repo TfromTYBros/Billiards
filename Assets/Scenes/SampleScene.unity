@@ -1202,7 +1202,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 208881267}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.752, y: -2.251, z: 7}
+  m_LocalPosition: {x: -4.752, y: -2.251, z: 8}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 615325068}
@@ -1846,8 +1846,6 @@ GameObject:
   m_Component:
   - component: {fileID: 443615751}
   - component: {fileID: 443615754}
-  - component: {fileID: 443615753}
-  - component: {fileID: 443615752}
   m_Layer: 0
   m_Name: resetbutton
   m_TagString: Untagged
@@ -1869,61 +1867,6 @@ Transform:
   m_Father: {fileID: 1617576793}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &443615752
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443615750}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 4
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1080360714}
-          m_TargetAssemblyTypeName: HandBallScript, Assembly-CSharp
-          m_MethodName: ReStartGame
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
---- !u!61 &443615753
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443615750}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: -0.24410915, y: -2.8479693}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 9.8, y: 9.8}
-    newSize: {x: 9.8, y: 9.8}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 27.2133, y: 16.472385}
-  m_EdgeRadius: 0
 --- !u!212 &443615754
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2839,7 +2782,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_EventMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2147483647
   m_MaxRayIntersections: 0
 --- !u!20 &519420031
 Camera:
@@ -3168,7 +3111,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 521293867}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.251, z: 7}
+  m_LocalPosition: {x: 0, y: 2.251, z: 8}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 615325068}
@@ -4308,7 +4251,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 664131170}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.749, y: 2.251, z: 7}
+  m_LocalPosition: {x: 4.749, y: 2.251, z: 8}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 615325068}
@@ -6501,7 +6444,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 0}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 1500
+  m_MaxValue: 1000
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
@@ -6630,6 +6573,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 1080360712}
   speed: 0
+  BreakShot: 0
   currStep: 0
   CushionHitCount: 0
   SpeedFieldBox: {fileID: 668425451}
@@ -6673,6 +6617,8 @@ MonoBehaviour:
   Clear_Cushion_HandBall: 0
   Clear_Cushion_CurrBall: 0
   Clear_Cushion_MinimumBall: 0
+  Damaged: 0
+  BoolFreeBalled: 0
   GameOverPanel: {fileID: 1617576790}
 --- !u!58 &1080360715
 CircleCollider2D:
@@ -8679,7 +8625,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1343441130}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.749, y: -2.251, z: 7}
+  m_LocalPosition: {x: 4.749, y: -2.251, z: 8}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 615325068}
@@ -9221,7 +9167,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -125.200005}
+  m_AnchoredPosition: {x: 0, y: -161.74}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1413933736
@@ -9257,7 +9203,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u3082\u3046\u3044\u3063\u304B\u3044\uFF01"
+  m_Text: "\u30AF\u30EA\u30C3\u30AF\u3067\u30EA\u30C8\u30E9\u30A4\uFF01"
 --- !u!222 &1413933737
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10734,7 +10680,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1668215459}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.752, y: 2.251, z: 7}
+  m_LocalPosition: {x: -4.752, y: 2.251, z: 8}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 615325068}
@@ -13504,7 +13450,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2115278173}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2.251, z: 7}
+  m_LocalPosition: {x: 0, y: -2.251, z: 8}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 615325068}
