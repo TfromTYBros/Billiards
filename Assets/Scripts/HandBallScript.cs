@@ -9,7 +9,7 @@ public class HandBallScript : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     new Rigidbody2D rigidbody2D;
     [SerializeField] float speed = 0.0f;
-    bool BreakShot = false;
+    [SerializeField] bool BreakShot = false;
     bool StepHeadArea = true;
     bool StepRotation = false;
     bool StepSpeed = false;
@@ -33,7 +33,8 @@ public class HandBallScript : MonoBehaviour
 
     private readonly WaitForSeconds MoveStopTime = new WaitForSeconds(10.0f);
     bool CoroutineNow = false;
-    bool Damaged = false;
+    [SerializeField] bool Damaged = false;
+    [SerializeField] bool BoolFreeBalled = false;
 
     public GameObject GameOverPanel;
     Vector3[] BallsPosOnStart = new Vector3[15];
@@ -74,6 +75,7 @@ public class HandBallScript : MonoBehaviour
         TrueCantTouchAreaBox();
         TrueBreakShot();
         SaveBallsPosOnStart();
+        TrueBoolFreeBall();
     }
 
     void Update()
@@ -97,7 +99,8 @@ public class HandBallScript : MonoBehaviour
 
     private void StepDown()
     {
-        if (FIRST < currStep)currStep--;
+        if (!GetFreeBall() && currStep == SECOND) return;
+        else if (FIRST < currStep) currStep--;
     }
 
     private void TrueBreakShot()
@@ -249,10 +252,27 @@ public class HandBallScript : MonoBehaviour
     {
         Damaged = true;
     }
-
+    
     private void FalseDamaged()
     {
         Damaged = false;
+    }
+
+    private void TrueBoolFreeBall()
+    {
+        Debug.Log("TrueBoolFreeBall");
+        BoolFreeBalled = true;
+    }
+
+    private void FalseBoolFreeBall()
+    {
+        Debug.Log("FalseBoolFreeBall");
+        BoolFreeBalled = false;
+    }
+
+    private bool GetFreeBall()
+    {
+        return BoolFreeBalled;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -388,43 +408,25 @@ public class HandBallScript : MonoBehaviour
             SetFalseIsAllBallsStop();
             StartCoroutine(AllBallStop());
             TrueCoroutineNow();
+            FalseBoolFreeBall();
         }
     }
 
     void StepReMove()
     {
-        //if (THIRD <= currStep || (!BreakShot && SECOND <= currStep)) StepDown();
         StepDown();
         if (currStep == FIRST)
         {
-            FreezeBalls();
-
-            TrueStepHeadArea();
-            FalseStepRotation();
-            FalseStepSpeed();
-
+            GoFirstStep();
             FalseQue();
             if (BreakShot) CantTouchAreaBox.SetActive(true);
         }
         else if (currStep == SECOND)
         {
-            FalseStepHeadArea();
-            TrueStepRotation();
-            FalseStepSpeed();
+            GoSecondStep();
             FalseSpeedFieldBox();
             TrueQue();
         }
-    }
-
-    private void GoSecondStep()
-    {
-        //IsAllBallsStop‚ÍAllBallStop()‚ÅŽÀ‘•Ï‚ÝB
-        TrueSpriteRenderer();
-        FalseStepHeadArea();
-        TrueStepRotation();
-        FalseStepSpeed();
-        currStep = SECOND;
-        timerScript.ResetTimer();
     }
 
     private void GoFirstStep()
@@ -435,6 +437,17 @@ public class HandBallScript : MonoBehaviour
         FalseStepRotation();
         FalseStepSpeed();
         currStep = FIRST;
+        timerScript.ResetTimer();
+    }
+
+    private void GoSecondStep()
+    {
+        //IsAllBallsStop‚ÍAllBallStop()‚ÅŽÀ‘•Ï‚ÝB
+        TrueSpriteRenderer();
+        FalseStepHeadArea();
+        TrueStepRotation();
+        FalseStepSpeed();
+        currStep = SECOND;
         timerScript.ResetTimer();
     }
 
@@ -553,10 +566,6 @@ public class HandBallScript : MonoBehaviour
     private void CleanUp()
     {
         FalseCoroutineNow();
-        FalseFoulChecked();
-        FalseClear_Cushion_HandBall();
-        FalseClear_Cushion_CurrBall();
-        FalseClear_Minimum();
         if (BreakShot)
         {
             FalseBreakShot();
@@ -571,8 +580,13 @@ public class HandBallScript : MonoBehaviour
         {
             //Debug.Log("Foul");
             if (!Damaged) DamageMethod();
+            TrueBoolFreeBall();
             IsGameOver(FIRST);
         }
+        FalseFoulChecked();
+        FalseClear_Cushion_HandBall();
+        FalseClear_Cushion_CurrBall();
+        FalseClear_Minimum();
         FalseDamaged();
     }
 
@@ -602,6 +616,7 @@ public class HandBallScript : MonoBehaviour
 
     void DamageMethod()
     {
+        Debug.Log("Damaged");
         heartScript.LifeSpriteChange();
         TrueDamaged();
     }
