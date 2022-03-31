@@ -80,8 +80,11 @@ public class HandBallScript : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKey(KeyCode.Space)) RackMold();
+
         if (Input.GetMouseButtonDown(0) && IsAllBallsStop && !heartScript.LifeSafe()) ReStartGame();
-        else if (Input.GetMouseButtonDown(0) && IsAllBallsStop && heartScript.LifeSafe()) StepMove();
+        
+        if (Input.GetMouseButtonDown(0) && IsAllBallsStop && heartScript.LifeSafe()) StepMove();
         if (Input.GetMouseButtonDown(1) && IsAllBallsStop && heartScript.LifeSafe()) StepReMove();
         if (BreakShot && StepHeadArea) MouseFollowHeadSpotArea();
         else if (!BreakShot && StepHeadArea) FreeBall();
@@ -400,6 +403,7 @@ public class HandBallScript : MonoBehaviour
             FalseStepSpeed();
 
             FalseSpeedFieldBox();
+            //FalseBreakShot();
             AddForce();
             SetFalseIsAllBallsStop();
             StartCoroutine(AllBallStop());
@@ -565,15 +569,8 @@ public class HandBallScript : MonoBehaviour
         if (BreakShot)
         {
             FalseBreakShot();
-            if (IsSafeOnBreakShot())
-            {
-                GoSecondStep();
-            }
-            else
-            {
-                DamageMethod();
-                GoFirstStep();
-            }
+            if (IsSafeOnBreakShot()) GoSecondStep();
+            else GoFirstStep();
         }
         else if ((Clear_Cushion_HandBall || Clear_Cushion_CurrBall) && Clear_Minimum)
         {
@@ -607,13 +604,8 @@ public class HandBallScript : MonoBehaviour
 
     public void CushionHitCountUp()
     {
-        Debug.Log("CushionHitCountUp");
+        //Debug.Log("CushionHitCountUp");
         CushionHitCount++;
-    }
-
-    private void CushionHitCountReset()
-    {
-        CushionHitCount = 0;
     }
 
     bool IsSafeOnBreakShot()
@@ -647,13 +639,24 @@ public class HandBallScript : MonoBehaviour
 
     public void ReStartGame()
     {
-        TrueBreakShot();
-        CantTouchAreaBox.SetActive(true);
+        //球を定位置に移動
         RackMold();
-        TrueSpriteRenderer();
+
+        //全ての球をActiveTrue
+
+        //HandBallの定位置への移動
+
+        //HandBallを有効化
+
+        //timerのリセット？
+
+        //LifeCountのリセット
         heartScript.ResetLife();
-        GoFirstStep();
-        CushionHitCountReset();
+
+        //BreakShotをTrue
+
+        //BreakshotなAreaをTrue
+
         GameOverPanel.SetActive(false);
     }
 
@@ -678,5 +681,10 @@ public class HandBallScript : MonoBehaviour
             ball.transform.position = BallsPosOnStart[index];
             index++;
         }
+    }
+
+    public void TestMethod()
+    {
+        Debug.Log("Text");
     }
 }
