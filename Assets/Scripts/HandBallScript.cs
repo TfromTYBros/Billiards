@@ -518,8 +518,11 @@ public class HandBallScript : MonoBehaviour
             mouse.y = speedFieldVec.y + SPEEDDIFF_POS;
         }
         SpeedArrow.transform.position = mouse;
-        float Diff = speedFieldVec.y < 0 ? -speedFieldVec.y : speedFieldVec.y;
-        SetSpeed((BASE_SPEED + mouse.y + Diff) * MAGNIFICATION);
+        /*
+        Debug.Log(speedFieldVec);
+        Debug.Log(mouse);
+        Debug.Log(BASE_SPEED + mouse.y - speedFieldVec.y);*/
+        SetSpeed((BASE_SPEED + mouse.y - speedFieldVec.y) * MAGNIFICATION);
     }
 
     private void SetSpeedField()
@@ -577,11 +580,12 @@ public class HandBallScript : MonoBehaviour
         }
         else if ((Clear_Cushion_HandBall || Clear_Cushion_CurrBall) && Clear_Minimum)
         {
+            Debug.Log("NoFoul");
             IsGameOver(SECOND);
         }
         else
         {
-            //Debug.Log("Foul");
+            Debug.Log("Foul");
             if (!Damaged) DamageMethod();
             TrueBoolFreeBall();
             IsGameOver(FIRST);
