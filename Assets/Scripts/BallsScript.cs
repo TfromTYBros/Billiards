@@ -17,6 +17,7 @@ public class BallsScript : MonoBehaviour
         {
             Debug.Log("HoleHit" + this.gameObject.name);
             HBS.PocketCountPlus();
+            HBS.TrueClear_AnyBallPocket();
             this.gameObject.SetActive(false);
         }
 

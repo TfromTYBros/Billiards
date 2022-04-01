@@ -30,6 +30,7 @@ public class HandBallScript : MonoBehaviour
     [SerializeField] bool Clear_Cushion_HandBall = false;
     [SerializeField] bool Clear_Cushion_CurrBall = false;
     [SerializeField] bool Clear_Cushion_MinimumBall = false;
+    [SerializeField] bool Clear_AnyBallPocket = false;
 
     private readonly WaitForSeconds MoveStopTime = new WaitForSeconds(10.0f);
     bool CoroutineNow = false;
@@ -40,7 +41,8 @@ public class HandBallScript : MonoBehaviour
     public GameObject GameClearPanel;
     int PocketCount = 0;
     Vector3[] BallsPosOnStart = new Vector3[15];
-    Vector3 StartHandBallPos = new Vector3(-2.7f,0.0f,5.0f);
+    Vector3 StartHandBallPos = new Vector3(-2.7f,0.0f,4.0f);
+    Vector3 HandBallPosOnPanel = new Vector3(-2.7f, 0.0f, 5.0f);
 
     private readonly int DEGREE_90 = 90;
     private readonly int DEGREE_180 = 180;
@@ -56,7 +58,7 @@ public class HandBallScript : MonoBehaviour
     private readonly float SAFE_ZONE_POS_ON_BOARD_Y = 1.826f;
 
     private readonly float BREAKSHOT_AREA = 2.6f;
-    private readonly float HANDBALL_POS = 5.0f;
+    private readonly float HANDBALL_POS = 4.0f;
 
     private readonly float SAFEZONE_POS = 1.5f;
     private readonly float SCREEN_NEAR = 3.0f;
@@ -232,6 +234,16 @@ public class HandBallScript : MonoBehaviour
         Clear_Cushion_CurrBall = false;
     }
 
+    public void TrueClear_AnyBallPocket()
+    {
+        Clear_AnyBallPocket = true;
+    }
+
+    private void FalseClear_AnyBallPocket()
+    {
+        Clear_AnyBallPocket = false;
+    }
+
     private void TrueCoroutineNow()
     {
         CoroutineNow = true;
@@ -305,11 +317,11 @@ public class HandBallScript : MonoBehaviour
         if (!FoulChecked && currStep == THIRD && !collision.gameObject.CompareTag("Cushion") && !collision.gameObject.CompareTag("Hole") && !BreakShot && collision.gameObject != GetCurrMinimumBall())
         {
             TrueFoulChecked();
-            Debug.Log("FoulTouch");
+            //Debug.Log("FoulTouch");
         }
         else if (!FoulChecked && currStep == THIRD && !collision.gameObject.CompareTag("Cushion") && !collision.gameObject.CompareTag("Hole") && !BreakShot && collision.gameObject == GetCurrMinimumBall())
         {
-            Debug.Log("NoFoul");
+            //Debug.Log("NoFoul");
             TrueClear_Minimum();
             TrueFoulChecked();
         }
@@ -535,10 +547,10 @@ public class HandBallScript : MonoBehaviour
             mouse.y = speedFieldVec.y + SPEEDDIFF_POS;
         }
         SpeedArrow.transform.position = mouse;
-        /*
+        
         Debug.Log(speedFieldVec);
         Debug.Log(mouse);
-        Debug.Log(BASE_SPEED + mouse.y - speedFieldVec.y);*/
+        Debug.Log(BASE_SPEED + mouse.y - speedFieldVec.y);
         SetSpeed((BASE_SPEED + mouse.y - speedFieldVec.y) * MAGNIFICATION);
     }
 
@@ -595,14 +607,14 @@ public class HandBallScript : MonoBehaviour
                 GoFirstStep();
             }
         }
-        else if ((Clear_Cushion_HandBall || Clear_Cushion_CurrBall) && Clear_Minimum)
+        else if ((Clear_Cushion_HandBall || Clear_Cushion_CurrBall || Clear_AnyBallPocket) && Clear_Minimum)
         {
-            Debug.Log("NoFoul");
+            //Debug.Log("NoFoul");
             IsGameOver(SECOND);
         }
         else
         {
-            Debug.Log("Foul");
+            //Debug.Log("Foul");
             if (!Damaged) DamageMethod();
             TrueBoolFreeBall();
             IsGameOver(FIRST);
@@ -611,6 +623,7 @@ public class HandBallScript : MonoBehaviour
         FalseClear_Cushion_HandBall();
         FalseClear_Cushion_CurrBall();
         FalseClear_Minimum();
+        FalseClear_AnyBallPocket();
         FalseDamaged();
     }
 
@@ -639,13 +652,13 @@ public class HandBallScript : MonoBehaviour
 
     bool IsSafeOnBreakShot()
     {
-        if (CushionHitCount < 3) return false;
+        if (CushionHitCount < 3 && !Clear_AnyBallPocket) return false;
         return true;
     }
 
     void DamageMethod()
     {
-        Debug.Log("Damaged");
+        //Debug.Log("Damaged");
         heartScript.LifeSpriteChange();
         TrueDamaged();
     }
@@ -663,7 +676,8 @@ public class HandBallScript : MonoBehaviour
 
     void GameOver()
     {
-        Debug.Log("GameOver");
+        //Debug.Log("GameOver");
+        HandBallPosChangeOnPanel();
         GameOverPanel.SetActive(true);
     }
 
@@ -711,7 +725,13 @@ public class HandBallScript : MonoBehaviour
 
     private void GameClear()
     {
-        Debug.Log("GameClear");
+        //Debug.Log("GameClear");
+        HandBallPosChangeOnPanel();
         GameClearPanel.SetActive(true);
+    }
+
+    private void HandBallPosChangeOnPanel()
+    {
+        this.gameObject.transform.position = HandBallPosOnPanel;
     }
 }
