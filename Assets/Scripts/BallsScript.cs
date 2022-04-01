@@ -15,9 +15,9 @@ public class BallsScript : MonoBehaviour
     {
         if (collision.transform.CompareTag("Hole"))
         {
-            //Debug.Log("HoleHit" + this.gameObject.name);
+            Debug.Log("HoleHit" + this.gameObject.name);
+            HBS.PocketCountPlus();
             this.gameObject.SetActive(false);
-            //ここからポケットした個数を計算してClearさせるのはあり。
         }
 
         if (collision.gameObject.CompareTag("Cushion") && this.gameObject == HBS.GetCurrMinimumBall())

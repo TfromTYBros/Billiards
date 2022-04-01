@@ -37,8 +37,10 @@ public class HandBallScript : MonoBehaviour
     [SerializeField] bool BoolFreeBalled = false;
 
     public GameObject GameOverPanel;
+    public GameObject GameClearPanel;
+    int PocketCount = 0;
     Vector3[] BallsPosOnStart = new Vector3[15];
-    Vector3 StartHandBallPos = new Vector3(-2.7f,0.0f,4.0f);
+    Vector3 StartHandBallPos = new Vector3(-2.7f,0.0f,5.0f);
 
     private readonly int DEGREE_90 = 90;
     private readonly int DEGREE_180 = 180;
@@ -54,7 +56,7 @@ public class HandBallScript : MonoBehaviour
     private readonly float SAFE_ZONE_POS_ON_BOARD_Y = 1.826f;
 
     private readonly float BREAKSHOT_AREA = 2.6f;
-    private readonly float HANDBALL_POS = 4.0f;
+    private readonly float HANDBALL_POS = 5.0f;
 
     private readonly float SAFEZONE_POS = 1.5f;
     private readonly float SCREEN_NEAR = 3.0f;
@@ -80,7 +82,7 @@ public class HandBallScript : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && IsAllBallsStop && !heartScript.LifeSafe()) ReStartGame();
+        if (Input.GetMouseButtonDown(0) && IsAllBallsStop && (!heartScript.LifeSafe() || IsGameClear() )) ReStartGame();
         else if (Input.GetMouseButtonDown(0) && IsAllBallsStop && heartScript.LifeSafe()) StepMove();
         if (Input.GetMouseButtonDown(1) && IsAllBallsStop && heartScript.LifeSafe()) StepReMove();
         if (BreakShot && StepHeadArea) MouseFollowHeadSpotArea();
@@ -270,6 +272,21 @@ public class HandBallScript : MonoBehaviour
     private bool GetFreeBall()
     {
         return BoolFreeBalled;
+    }
+
+    public void PocketCountPlus()
+    {
+        PocketCount++;
+    }
+
+    private void PocketCountReset()
+    {
+        PocketCount = 0;
+    }
+
+    private int GetPocketCount()
+    {
+        return PocketCount;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -635,7 +652,8 @@ public class HandBallScript : MonoBehaviour
 
     void IsGameOver(int Step)
     {
-        if (!heartScript.LifeSafe()) GameOver();
+        if (IsGameClear()) GameClear();
+        else if (!heartScript.LifeSafe()) GameOver();
         else
         {
             if (Step == FIRST) GoFirstStep();
@@ -658,7 +676,9 @@ public class HandBallScript : MonoBehaviour
         heartScript.ResetLife();
         GoFirstStep();
         CushionHitCountReset();
+        PocketCountReset();
         GameOverPanel.SetActive(false);
+        GameClearPanel.SetActive(false);
     }
 
     private void SaveBallsPosOnStart()
@@ -673,7 +693,7 @@ public class HandBallScript : MonoBehaviour
 
     private void RackMold()
     {
-        Debug.Log("RackMold");
+        //Debug.Log("RackMold");
         this.gameObject.transform.position = StartHandBallPos;
         int index = 0;
         foreach (GameObject ball in BallsOBJ)
@@ -682,5 +702,16 @@ public class HandBallScript : MonoBehaviour
             ball.transform.position = BallsPosOnStart[index];
             index++;
         }
+    }
+
+    private bool IsGameClear()
+    {
+        return heartScript.LifeSafe() && (15 <= GetPocketCount());
+    }
+
+    private void GameClear()
+    {
+        Debug.Log("GameClear");
+        GameClearPanel.SetActive(true);
     }
 }
