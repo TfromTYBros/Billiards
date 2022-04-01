@@ -64,6 +64,8 @@ public class HandBallScript : MonoBehaviour
     private readonly float SAFEZONE_POS = 1.5f;
     private readonly float SCREEN_NEAR = 3.0f;
     private readonly float NOTHING_F = 0.0f;
+    private readonly float AVOID_DISTANCE = 1.5f;
+    private readonly float HANDBALL_DISTANCE = 1.0f;
 
     private readonly float SPEEDDIFF_POS = 1.7f;
     private readonly float FOREMOST_POS = 2.0f;
@@ -557,10 +559,10 @@ public class HandBallScript : MonoBehaviour
             mouse.y = speedFieldVec.y + SPEEDDIFF_POS;
         }
         SpeedArrow.transform.position = mouse;
-        
+        /*
         Debug.Log(speedFieldVec);
         Debug.Log(mouse);
-        Debug.Log(BASE_SPEED + mouse.y - speedFieldVec.y);
+        Debug.Log(BASE_SPEED + mouse.y - speedFieldVec.y);*/
         SetSpeed((BASE_SPEED + mouse.y - speedFieldVec.y) * MAGNIFICATION);
     }
 
@@ -568,7 +570,6 @@ public class HandBallScript : MonoBehaviour
     {
         TrueSpeedFieldBox();
         SpeedFieldBox.transform.rotation = Quaternion.identity;
-        //Vector3 SpeedPos = SpeedFieldBox.transform.position;
         Vector3 SpeedPos = QueBoard.transform.position;
         SpeedPos.z = SCREEN_NEAR;
         if (this.transform.position.y <= -SAFEZONE_POS)
@@ -579,11 +580,11 @@ public class HandBallScript : MonoBehaviour
         {
             SpeedPos.y = NOTHING_F;
         }
-        if ( -1.0f <= (this.transform.position.x - SpeedPos.x) && (this.transform.position.x - SpeedPos.x) <= 1.0f)
+        if ( -HANDBALL_DISTANCE <= (this.transform.position.x - SpeedPos.x) && (this.transform.position.x - SpeedPos.x) <= HANDBALL_DISTANCE)
         {
-            SpeedPos.x = this.transform.position.x + 1.5f;
+            SpeedPos.x = this.transform.position.x + AVOID_DISTANCE;
         }
-        Debug.Log(SpeedPos);
+        //Debug.Log(SpeedPos);
         SpeedFieldBox.transform.position = SpeedPos;
         SpeedField.transform.position = SpeedPos;
     }
