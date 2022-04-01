@@ -21,6 +21,7 @@ public class HandBallScript : MonoBehaviour
     public GameObject SpeedArrow;
     public GameObject CantTouchAreaBox;
     public GameObject Que;
+    public GameObject QueBoard;
     public GameObject[] BallsOBJ = new GameObject[15];
     public Transform[] BallsPos = new Transform[15];
 
@@ -29,8 +30,8 @@ public class HandBallScript : MonoBehaviour
     [SerializeField] bool Clear_Minimum = false;
     [SerializeField] bool Clear_Cushion_HandBall = false;
     [SerializeField] bool Clear_Cushion_CurrBall = false;
-    [SerializeField] bool Clear_Cushion_MinimumBall = false;
     [SerializeField] bool Clear_AnyBallPocket = false;
+    [SerializeField] bool HandBallPocket = false;
 
     private readonly WaitForSeconds MoveStopTime = new WaitForSeconds(10.0f);
     bool CoroutineNow = false;
@@ -244,6 +245,16 @@ public class HandBallScript : MonoBehaviour
         Clear_AnyBallPocket = false;
     }
 
+    private void TrueHandBallPocket()
+    {
+        HandBallPocket = true;
+    }
+
+    private void FalseHandBallPocket()
+    {
+        HandBallPocket = false;
+    }
+
     private void TrueCoroutineNow()
     {
         CoroutineNow = true;
@@ -308,9 +319,7 @@ public class HandBallScript : MonoBehaviour
             //Debug.Log("HoleHitByHandBall");
             HandBallDisappear();
             if (!BreakShot && !Damaged) DamageMethod();
-            FalseClear_Cushion_HandBall();
-            FalseClear_Cushion_CurrBall();
-            FalseClear_Minimum();
+            TrueHandBallPocket();
         }
 
         //BreakShotˆÈŠO‚ÌŽž
@@ -558,7 +567,8 @@ public class HandBallScript : MonoBehaviour
     {
         TrueSpeedFieldBox();
         SpeedFieldBox.transform.rotation = Quaternion.identity;
-        Vector3 SpeedPos = SpeedFieldBox.transform.position;
+        //Vector3 SpeedPos = SpeedFieldBox.transform.position;
+        Vector3 SpeedPos = QueBoard.transform.position;
         SpeedPos.z = SCREEN_NEAR;
         if (this.transform.position.y <= -SAFEZONE_POS)
         {
@@ -607,7 +617,7 @@ public class HandBallScript : MonoBehaviour
                 GoFirstStep();
             }
         }
-        else if ((Clear_Cushion_HandBall || Clear_Cushion_CurrBall || Clear_AnyBallPocket) && Clear_Minimum)
+        else if ((Clear_Cushion_HandBall || Clear_Cushion_CurrBall || Clear_AnyBallPocket) && Clear_Minimum && !HandBallPocket)
         {
             //Debug.Log("NoFoul");
             IsGameOver(SECOND);
@@ -624,6 +634,7 @@ public class HandBallScript : MonoBehaviour
         FalseClear_Cushion_CurrBall();
         FalseClear_Minimum();
         FalseClear_AnyBallPocket();
+        FalseHandBallPocket();
         FalseDamaged();
     }
 
@@ -652,7 +663,7 @@ public class HandBallScript : MonoBehaviour
 
     bool IsSafeOnBreakShot()
     {
-        if (CushionHitCount < 3 && !Clear_AnyBallPocket) return false;
+        if ((CushionHitCount < 3 && !Clear_AnyBallPocket) || HandBallPocket) return false;
         return true;
     }
 
@@ -730,8 +741,14 @@ public class HandBallScript : MonoBehaviour
         GameClearPanel.SetActive(true);
     }
 
+    private void SetHandBallPosOnPanel()
+    {
+        HandBallPosOnPanel = new Vector3(this.transform.position.x, this.transform.position.y, HandBallPosOnPanel.z);
+    }
+
     private void HandBallPosChangeOnPanel()
     {
+        SetHandBallPosOnPanel();
         this.gameObject.transform.position = HandBallPosOnPanel;
     }
 }

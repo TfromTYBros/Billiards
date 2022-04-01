@@ -6855,6 +6855,7 @@ MonoBehaviour:
   Clear_Cushion_HandBall: 0
   Clear_Cushion_CurrBall: 0
   Clear_Cushion_MinimumBall: 0
+  Clear_AnyBallPocket: 0
   Damaged: 0
   BoolFreeBalled: 0
   GameOverPanel: {fileID: 1617576790}
