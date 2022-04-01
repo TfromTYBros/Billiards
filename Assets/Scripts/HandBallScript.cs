@@ -282,7 +282,7 @@ public class HandBallScript : MonoBehaviour
 
     private void TrueBoolFreeBall()
     {
-        Debug.Log("TrueBoolFreeBall");
+        //Debug.Log("TrueBoolFreeBall");
         BoolFreeBalled = true;
     }
 
@@ -465,6 +465,7 @@ public class HandBallScript : MonoBehaviour
 
     private void GoFirstStep()
     {
+        TrueBoolFreeBall();
         SetTrueIsAllBallsStop();
         FreezeBalls();
         TrueStepHeadArea();
@@ -574,10 +575,15 @@ public class HandBallScript : MonoBehaviour
         {
             SpeedPos.y = NOTHING_F;
         }
-        if(SAFEZONE_POS <= this.transform.position.y)
+        if (SAFEZONE_POS <= this.transform.position.y)
         {
             SpeedPos.y = NOTHING_F;
         }
+        if ( -1.0f <= (this.transform.position.x - SpeedPos.x) && (this.transform.position.x - SpeedPos.x) <= 1.0f)
+        {
+            SpeedPos.x = this.transform.position.x + 1.5f;
+        }
+        Debug.Log(SpeedPos);
         SpeedFieldBox.transform.position = SpeedPos;
         SpeedField.transform.position = SpeedPos;
     }
@@ -626,7 +632,6 @@ public class HandBallScript : MonoBehaviour
         {
             //Debug.Log("Foul");
             if (!Damaged) DamageMethod();
-            TrueBoolFreeBall();
             IsGameOver(FIRST);
         }
         FalseFoulChecked();

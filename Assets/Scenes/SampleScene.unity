@@ -6682,7 +6682,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 0}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 1000
+  m_MaxValue: 1200
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
@@ -6819,6 +6819,7 @@ MonoBehaviour:
   SpeedArrow: {fileID: 794956537}
   CantTouchAreaBox: {fileID: 725980567}
   Que: {fileID: 768313577}
+  QueBoard: {fileID: 278918592}
   BallsOBJ:
   - {fileID: 1171233246}
   - {fileID: 449099409}
@@ -6854,8 +6855,8 @@ MonoBehaviour:
   Clear_Minimum: 1
   Clear_Cushion_HandBall: 0
   Clear_Cushion_CurrBall: 0
-  Clear_Cushion_MinimumBall: 0
   Clear_AnyBallPocket: 0
+  HandBallPocket: 0
   Damaged: 0
   BoolFreeBalled: 0
   GameOverPanel: {fileID: 1617576790}

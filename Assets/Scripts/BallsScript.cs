@@ -15,7 +15,7 @@ public class BallsScript : MonoBehaviour
     {
         if (collision.transform.CompareTag("Hole"))
         {
-            Debug.Log("HoleHit" + this.gameObject.name);
+            //Debug.Log("HoleHit" + this.gameObject.name);
             HBS.PocketCountPlus();
             HBS.TrueClear_AnyBallPocket();
             this.gameObject.SetActive(false);
