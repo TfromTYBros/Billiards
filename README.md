@@ -3,12 +3,12 @@ Billiards
 ![gif](https://github.com/TfromTYBros/Billiards/blob/main/billiards.gif)
 
 ## GameLink
-https://unityroom.com/games/billiard15balls
-  UnityRoomさんにアップロードして遊べるようにしました。
+https://unityroom.com/games/billiard15balls  
+UnityRoomさんにアップロードして遊べるようにしました。
 
 ## Overview
-https://recursionist.io/dashboard/course/22/lesson/825
-  の課題です。
+https://recursionist.io/dashboard/course/22/lesson/825  
+の課題です。
 
 ## Process
 制作時間は35.4時間です。
