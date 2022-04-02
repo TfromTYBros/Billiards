@@ -731,6 +731,7 @@ public class HandBallScript : MonoBehaviour
         {
             ball.SetActive(true);
             ball.transform.position = BallsPosOnStart[index];
+            ball.transform.rotation = Quaternion.identity;
             index++;
         }
     }
