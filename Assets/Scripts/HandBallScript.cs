@@ -43,6 +43,7 @@ public class HandBallScript : MonoBehaviour
     int PocketCount = 0;
     Vector3[] BallsPosOnStart = new Vector3[15];
     Vector3 StartHandBallPos = new Vector3(-2.7f,0.0f,4.0f);
+    Vector3 ScreenOutPos = new Vector3(10.0f, 0.0f, 4.0f);
     Vector3 HandBallPosOnPanel = new Vector3(-2.7f, 0.0f, 5.0f);
 
     private readonly int DEGREE_90 = 90;
@@ -61,11 +62,11 @@ public class HandBallScript : MonoBehaviour
     private readonly float BREAKSHOT_AREA = 2.6f;
     private readonly float HANDBALL_POS = 4.0f;
 
-    private readonly float SAFEZONE_POS = 1.5f;
+    private readonly float SAFEZONE_POS = 0.7f;
     private readonly float SCREEN_NEAR = 3.0f;
     private readonly float NOTHING_F = 0.0f;
     private readonly float AVOID_DISTANCE = 1.5f;
-    private readonly float HANDBALL_DISTANCE = 1.0f;
+    private readonly float HANDBALL_DISTANCE = 2.0f;
 
     private readonly float SPEEDDIFF_POS = 1.7f;
     private readonly float FOREMOST_POS = 2.0f;
@@ -346,6 +347,7 @@ public class HandBallScript : MonoBehaviour
     private void HandBallDisappear()
     {
         rigidbody2D.velocity = Vector2.zero;
+        this.transform.position = ScreenOutPos;
         FalseSpriteRenderer();
     }
 
@@ -582,7 +584,7 @@ public class HandBallScript : MonoBehaviour
         }
         if ( -HANDBALL_DISTANCE <= (this.transform.position.x - SpeedPos.x) && (this.transform.position.x - SpeedPos.x) <= HANDBALL_DISTANCE)
         {
-            SpeedPos.x = this.transform.position.x + AVOID_DISTANCE;
+            SpeedPos.x = this.transform.position.x - SpeedPos.x <= 0.0f ? this.transform.position.x + AVOID_DISTANCE : this.transform.position.x - AVOID_DISTANCE;
         }
         //Debug.Log(SpeedPos);
         SpeedFieldBox.transform.position = SpeedPos;
