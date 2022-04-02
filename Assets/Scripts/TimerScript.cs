@@ -25,7 +25,7 @@ public class TimerScript : MonoBehaviour
 
     public void ResetTimer()
     {
-        timer.value = 1500;
+        timer.value = 600;
     }
 
     void TimerAdvances()
