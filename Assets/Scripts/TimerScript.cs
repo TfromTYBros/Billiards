@@ -17,6 +17,15 @@ public class TimerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        /*
+        if (HBS.GetCoroutineNow())
+        {
+            TimerAdvances();
+        }*/
+    }
+
+    private void FixedUpdate()
+    {
         if (HBS.GetCoroutineNow())
         {
             TimerAdvances();
@@ -25,7 +34,7 @@ public class TimerScript : MonoBehaviour
 
     public void ResetTimer()
     {
-        timer.value = 600;
+        timer.value = 500;
     }
 
     void TimerAdvances()
